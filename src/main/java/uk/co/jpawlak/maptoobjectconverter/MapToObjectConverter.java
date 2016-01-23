@@ -15,13 +15,17 @@ public class MapToObjectConverter {
     private static final ReflectionFactory REFLECTION_FACTORY = ReflectionFactory.getReflectionFactory();
 
     public <T> T convert(Map<String, Object> map, Class<T> aClass) {
+        if (aClass.isPrimitive()) {
+            throw new IllegalArgumentException("Converting to unboxed primitives types is not supported, use boxed primitive type instead");
+        }
+
         try {
             if (isBasicType(aClass)) {
                 if (map.size() != 1) {
                     throw new IllegalArgumentException(String.format("Cannot map non-singleton map to single basic type '%s'. Keys found: '%s'", String.class.getSimpleName(), map.keySet().stream().collect(joining("', '"))));
                 } else {
                     T t = (T) map.values().stream().findFirst().get();
-                    if (aClass.isInstance(t) || aClass.isPrimitive()) {
+                    if (aClass.isInstance(t)) {
                         return t;
                     } else {
                         throw new IllegalArgumentException(String.format("Cannot convert type '%s' to basic type '%s'", t.getClass().getSimpleName(), aClass.getSimpleName()));
@@ -56,8 +60,7 @@ public class MapToObjectConverter {
     }
 
     private static boolean isBasicType(Class<?> aClass) {
-        return aClass.isPrimitive()
-                || aClass == String.class
+        return aClass == String.class
                 || aClass == Character.class
                 || aClass == Boolean.class
                 || aClass == Byte.class

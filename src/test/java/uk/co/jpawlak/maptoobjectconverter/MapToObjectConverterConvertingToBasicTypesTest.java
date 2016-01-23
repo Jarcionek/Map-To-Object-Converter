@@ -1,7 +1,6 @@
 package uk.co.jpawlak.maptoobjectconverter;
 
 import com.google.common.collect.ImmutableMap;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -25,72 +24,80 @@ public class MapToObjectConverterConvertingToBasicTypesTest {
     public void convertsSingletonMapToUnboxedChar() {
         Map<String, Object> map = singletonMap("randomTextIgnoredByConverter_1", 'c');
 
-        char actual = mapToObjectConverter.convert(map, char.class);
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Converting to unboxed primitives types is not supported, use boxed primitive type instead");
 
-        assertThat(actual, equalTo('c'));
+        mapToObjectConverter.convert(map, char.class);
     }
 
     @Test
     public void convertsSingletonMapToUnboxedBoolean() {
         Map<String, Object> map = singletonMap("randomTextIgnoredByConverter_2", true);
 
-        boolean actual = mapToObjectConverter.convert(map, boolean.class);
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Converting to unboxed primitives types is not supported, use boxed primitive type instead");
 
-        assertThat(actual, equalTo(true));
+        mapToObjectConverter.convert(map, boolean.class);
     }
 
     @Test
     public void convertsSingletonMapToUnboxedByte() {
         Map<String, Object> map = singletonMap("randomTextIgnoredByConverter_3", (byte) 5);
 
-        byte actual = mapToObjectConverter.convert(map, byte.class);
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Converting to unboxed primitives types is not supported, use boxed primitive type instead");
 
-        assertThat(actual, equalTo((byte) 5));
+        mapToObjectConverter.convert(map, byte.class);
     }
 
     @Test
     public void convertsSingletonMapToUnboxedShort() {
         Map<String, Object> map = singletonMap("randomTextIgnoredByConverter_4", (short) 10);
 
-        short actual = mapToObjectConverter.convert(map, short.class);
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Converting to unboxed primitives types is not supported, use boxed primitive type instead");
 
-        assertThat(actual, equalTo((short) 10));
+        mapToObjectConverter.convert(map, short.class);
     }
 
     @Test
     public void convertsSingletonMapToUnboxedInt() {
         Map<String, Object> map = singletonMap("randomTextIgnoredByConverter_5", 15);
 
-        int actual = mapToObjectConverter.convert(map, int.class);
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Converting to unboxed primitives types is not supported, use boxed primitive type instead");
 
-        assertThat(actual, equalTo(15));
+        mapToObjectConverter.convert(map, int.class);
     }
 
     @Test
     public void convertsSingletonMapToUnboxedLong() {
         Map<String, Object> map = singletonMap("randomTextIgnoredByConverter_6", 20L);
 
-        long actual = mapToObjectConverter.convert(map, long.class);
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Converting to unboxed primitives types is not supported, use boxed primitive type instead");
 
-        assertThat(actual, equalTo(20L));
+        mapToObjectConverter.convert(map, long.class);
     }
 
     @Test
     public void convertsSingletonMapToUnboxedFloat() {
         Map<String, Object> map = singletonMap("randomTextIgnoredByConverter_7", 0.125f);
 
-        float actual = mapToObjectConverter.convert(map, float.class);
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Converting to unboxed primitives types is not supported, use boxed primitive type instead");
 
-        assertThat(actual, equalTo(0.125f));
+        mapToObjectConverter.convert(map, float.class);
     }
 
     @Test
     public void convertsSingletonMapToUnboxedDouble() {
         Map<String, Object> map = singletonMap("randomTextIgnoredByConverter_8", 0.0625d);
 
-        double actual = mapToObjectConverter.convert(map, double.class);
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Converting to unboxed primitives types is not supported, use boxed primitive type instead");
 
-        assertThat(actual, equalTo(0.0625d));
+        mapToObjectConverter.convert(map, double.class);
     }
 
     // mapping to boxed primitives /////////////////////////////////////////////////////////////////////////////////////
@@ -196,17 +203,6 @@ public class MapToObjectConverterConvertingToBasicTypesTest {
         expectedException.expectMessage("Cannot convert type 'String' to basic type 'Integer'");
 
         mapToObjectConverter.convert(map, Integer.class);
-    }
-
-    @Ignore
-    @Test
-    public void throwsExceptionInCaseOfTypeMismatchForPrimitive() {
-        Map<String, Object> map = singletonMap("x", true);
-
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Cannot convert type 'boolean' to basic type 'int'");
-
-        mapToObjectConverter.convert(map, int.class);
     }
 
 }
