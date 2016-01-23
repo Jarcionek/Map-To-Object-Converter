@@ -15,7 +15,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 /**
  * Basic types are 8 primitive java types (char, boolean, byte, short, int, long, float, double) + registered type mappers
  */
-public class MapToObjectConverterConvertingToBasicTypesTest {
+public class MapToObjectConverterTest_ConvertingToBasicTypes {
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
