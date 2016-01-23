@@ -13,7 +13,6 @@ import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 
-//@SuppressWarnings("unused") // classes declared here are used via reflection API
 public class MapToObjectConverterTest {
 
     @Rule
@@ -251,7 +250,6 @@ public class MapToObjectConverterTest {
 
 
     //TODO: support for jdbi specific types (Timestamp, what else?) - configurable?
-    //TODO: mapping to boxed primitives for singleton maps
     //TODO: type safety for generics in optionals
     //TODO: number of fields = keySet().size()
     //TODO: class with inheritance
