@@ -294,8 +294,9 @@ public class MapToObjectConverterTest {
     //TODO: type safety for generics in optionals
     //TODO: class with inheritance
     //TODO: class with inheritance - check for duplicate names
-    //TODO: ignores static fields
+    //TODO: check for static fields
+    //TODO: check for synthetic fields
     //TODO: support for non-primitive types - configurable
-    //TODO: ignores characters case in fields names (configurable)
+    //TODO: ignores characters case in fields names (configurable?) - currently case sensitive and untested
 
 }
