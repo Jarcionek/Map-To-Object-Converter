@@ -385,7 +385,7 @@ public class MapToObjectConverterTest {
 
 
 
-    private static class ChildClassWithRepeatedFieldName extends ParentClass {
+    private static class ChildClassWithDuplicatedField extends ParentClass {
         int a;
         public int getSuperA() {
             return super.a;
@@ -398,10 +398,28 @@ public class MapToObjectConverterTest {
                 "a", 7
         );
 
-        ChildClassWithRepeatedFieldName actual = mapToObjectConverter.convert(map, ChildClassWithRepeatedFieldName.class);
+        ChildClassWithDuplicatedField actual = mapToObjectConverter.convert(map, ChildClassWithDuplicatedField.class);
 
         assertThat(actual.a, equalTo(7));
         assertThat(actual.getSuperA(), equalTo(7));
+    }
+
+
+
+    private static class ChildClassWithDuplicatedFieldButOfDifferentType extends ParentClass {
+        String a;
+    }
+
+    @Test
+    public void throwsTypeMismatchExceptionWhenChildAndParentClassesHaveFieldOfTheSameNameButOfDifferentType() {
+        Map<String, Object> map = ImmutableMap.of(
+                "a", 7
+        );
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Cannot assign value of type 'java.lang.Integer' to field 'a' of type 'java.lang.String'");
+
+        mapToObjectConverter.convert(map, ChildClassWithDuplicatedFieldButOfDifferentType.class);
     }
 
     //TODO: check for static fields
