@@ -3,6 +3,7 @@ package uk.co.jpawlak.maptoobjectconverter;
 import sun.reflect.ReflectionFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
@@ -15,7 +16,9 @@ public class MapToObjectConverter {
             T result = createInstance(aClass);
 
             for (Map.Entry<String, Object> entry : map.entrySet()) {
-                aClass.getDeclaredField(entry.getKey()).set(result, entry.getValue());
+                Field field = aClass.getDeclaredField(entry.getKey());
+                field.setAccessible(true);
+                field.set(result, entry.getValue());
             }
 
             return result;

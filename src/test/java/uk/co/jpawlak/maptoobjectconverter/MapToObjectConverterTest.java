@@ -8,6 +8,7 @@ import java.util.Map;
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
 
 public class MapToObjectConverterTest {
 
@@ -156,7 +157,45 @@ public class MapToObjectConverterTest {
     }
 
 
-    //TODO: sets final fields
+
+    public static class ClassWithPrivateField {
+        private String string;
+    }
+
+    @Test
+    public void setsPrivateFields() {
+        Map<String, Object> map = singletonMap("string", "value");
+
+        ClassWithPrivateField actual = mapToObjectConverter.convert(map, ClassWithPrivateField.class);
+
+        ClassWithPrivateField expected = new ClassWithPrivateField();
+        expected.string = "value";
+
+        assertThat(actual, sameBeanAs(expected));
+    }
+
+
+
+    public static class ClassWithFinalField {
+        @SuppressWarnings("unused") // used via reflection API
+        private final String string;
+        public ClassWithFinalField(String string) {
+            this.string = string;
+        }
+    }
+
+    @Test
+    public void setsFinalFields() {
+        Map<String, Object> map = singletonMap("string", "value");
+
+        ClassWithFinalField actual = mapToObjectConverter.convert(map, ClassWithFinalField.class);
+
+        ClassWithFinalField expected = new ClassWithFinalField("value");
+
+        assertThat(actual, sameBeanAs(expected));
+    }
+
+
     //TODO: support for jdbi specific types (Timestamp, what else?) - configurable?
     //TODO: mapping to boxed primitives for singleton maps
     //TODO: requires Optional field for null values
