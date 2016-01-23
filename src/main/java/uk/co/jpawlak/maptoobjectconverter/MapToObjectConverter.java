@@ -5,10 +5,14 @@ import sun.reflect.ReflectionFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
+import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toCollection;
 
 public class MapToObjectConverter {
 
@@ -22,6 +26,8 @@ public class MapToObjectConverter {
         if (isBasicType(aClass)) {
             return singleBasicValue(map, aClass);
         }
+
+        checkKeysEqualToFieldsNames(map.keySet(), aClass);
 
         T result = createInstance(aClass);
 
@@ -60,6 +66,36 @@ public class MapToObjectConverter {
         return result;
     }
 
+    private static void checkKeysEqualToFieldsNames(Set<String> keys, Class<?> aClass) {
+        Set<String> fieldsNames = fieldsNamesOf(aClass);
+
+        Set<String> missingFields = keys.stream().filter(key -> !fieldsNames.contains(key)).collect(toCollection(LinkedHashSet::new));
+        if (!missingFields.isEmpty()) {
+            throw exception("No fields for keys: '%s'", missingFields.stream().collect(joining("', '")));
+        }
+
+        Set<String> missingValues = fieldsNames.stream().filter(fieldName -> !keys.contains(fieldName)).collect(toCollection(LinkedHashSet::new));
+        if (!missingValues.isEmpty()) {
+            throw exception("No values for fields: '%s'", missingValues.stream().collect(joining("', '")));
+        }
+    }
+
+    private static Set<String> fieldsNamesOf(Class<?> aClass) {
+        return stream(aClass.getDeclaredFields())
+                .map(Field::getName)
+                .collect(toCollection(LinkedHashSet::new));
+    }
+
+    private static <T> T createInstance(Class<T> aClass) {
+        try {
+            Constructor<Object> objectNoArgConstructor = Object.class.getDeclaredConstructor();
+            Constructor<?> constructor = REFLECTION_FACTORY.newConstructorForSerialization(aClass, objectNoArgConstructor);
+            return aClass.cast(constructor.newInstance());
+        } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static <T> void setFields(Map<String, Object> map, Class<T> aClass, T result) {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             Field field = field(aClass, entry.getKey());
@@ -87,7 +123,6 @@ public class MapToObjectConverter {
         }
     }
 
-
     private static void setField(Object object, Field field, Object value) {
         try {
             field.setAccessible(true);
@@ -96,18 +131,9 @@ public class MapToObjectConverter {
             throw new RuntimeException(e);
         }
     }
+
     private static IllegalArgumentException exception(String message, Object... args) {
         return new IllegalArgumentException(String.format(message, args));
-    }
-
-    private static <T> T createInstance(Class<T> aClass) {
-        try {
-            Constructor<Object> objectNoArgConstructor = Object.class.getDeclaredConstructor();
-            Constructor<?> constructor = REFLECTION_FACTORY.newConstructorForSerialization(aClass, objectNoArgConstructor);
-            return aClass.cast(constructor.newInstance());
-        } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

@@ -66,6 +66,32 @@ public class MapToObjectConverterTest {
         assertThat(actual, sameBeanAs(expected));
     }
 
+    @Test
+    public void throwsExceptionWhenMoreKeysThanFields() {
+        Map<String, Object> map = ImmutableMap.of(
+                "one", "1",
+                "two", "2",
+                "three", "3",
+                "four", "4",
+                "five", "5"
+        );
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("No fields for keys: 'four', 'five'");
+
+        mapToObjectConverter.convert(map, ClassWithMultipleFields.class);
+    }
+
+    @Test
+    public void throwsExceptionWhenFewerKeysThanFields() {
+        Map<String, Object> map = singletonMap("one", "1");
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("No values for fields: 'two', 'three'");
+
+        mapToObjectConverter.convert(map, ClassWithMultipleFields.class);
+    }
+
 
 
     public static class ClassWithNotWorkingConstructor {
@@ -249,12 +275,12 @@ public class MapToObjectConverterTest {
 
 
 
-    //TODO: support for non-primitive types - configurable
+    //TODO: optionals - differ between null value and no value at all
     //TODO: type safety for generics in optionals
-    //TODO: number of fields = keySet().size()
     //TODO: class with inheritance
     //TODO: class with inheritance - check for duplicate names
     //TODO: ignores static fields
+    //TODO: support for non-primitive types - configurable
     //TODO: ignores characters case in fields names (configurable)
 
 }
