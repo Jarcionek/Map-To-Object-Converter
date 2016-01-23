@@ -22,13 +22,13 @@ public class MapToObjectConverter {
         try {
             if (isBasicType(aClass)) {
                 if (map.size() != 1) {
-                    throw exception("Cannot map non-singleton map to single basic type '%s'. Keys found: '%s'", String.class.getSimpleName(), map.keySet().stream().collect(joining("', '")));
+                    throw exception("Cannot map non-singleton map to single basic type '%s'. Keys found: '%s'", String.class.getName(), map.keySet().stream().collect(joining("', '")));
                 } else {
                     T t = (T) map.values().stream().findFirst().get();
                     if (aClass.isInstance(t)) {
                         return t;
                     } else {
-                        throw exception("Cannot convert type '%s' to basic type '%s'", t.getClass().getSimpleName(), aClass.getSimpleName());
+                        throw exception("Cannot convert type '%s' to basic type '%s'", t.getClass().getName(), aClass.getName());
                     }
                 }
             }

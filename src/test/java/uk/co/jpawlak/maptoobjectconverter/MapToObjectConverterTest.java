@@ -249,7 +249,7 @@ public class MapToObjectConverterTest {
 
 
 
-    //TODO: support for jdbi specific types (Timestamp, what else?) - configurable?
+    //TODO: support for non-primitive types - configurable
     //TODO: type safety for generics in optionals
     //TODO: number of fields = keySet().size()
     //TODO: class with inheritance

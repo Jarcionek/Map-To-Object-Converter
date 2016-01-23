@@ -11,6 +11,9 @@ import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 
+/**
+ * Basic types are 8 primitive java types (char, boolean, byte, short, int, long, float, double) + registered type mappers
+ */
 public class MapToObjectConverterConvertingToBasicTypesTest {
 
     @Rule
@@ -190,7 +193,7 @@ public class MapToObjectConverterConvertingToBasicTypesTest {
         Map<String, Object> map = ImmutableMap.of("key1", "value1", "key2", "value2");
 
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Cannot map non-singleton map to single basic type 'String'. Keys found: 'key1', 'key2'");
+        expectedException.expectMessage("Cannot map non-singleton map to single basic type 'java.lang.String'. Keys found: 'key1', 'key2'");
 
         mapToObjectConverter.convert(map, String.class);
     }
@@ -200,7 +203,7 @@ public class MapToObjectConverterConvertingToBasicTypesTest {
         Map<String, Object> map = singletonMap("x", "hello");
 
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Cannot convert type 'String' to basic type 'Integer'");
+        expectedException.expectMessage("Cannot convert type 'java.lang.String' to basic type 'java.lang.Integer'");
 
         mapToObjectConverter.convert(map, Integer.class);
     }
