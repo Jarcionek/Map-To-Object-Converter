@@ -19,22 +19,13 @@ public class MapToObjectConverter {
             throw exception("Converting to unboxed primitives types is not supported, use boxed primitive type instead");
         }
 
+        if (isBasicType(aClass)) {
+            return singleBasicValue(map, aClass);
+        }
+
+        T result = createInstance(aClass);
+
         try {
-            if (isBasicType(aClass)) {
-                if (map.size() != 1) {
-                    throw exception("Cannot map non-singleton map to single basic type '%s'. Keys found: '%s'", String.class.getName(), map.keySet().stream().collect(joining("', '")));
-                } else {
-                    T t = (T) map.values().stream().findFirst().get();
-                    if (aClass.isInstance(t)) {
-                        return t;
-                    } else {
-                        throw exception("Cannot convert type '%s' to basic type '%s'", t.getClass().getName(), aClass.getName());
-                    }
-                }
-            }
-
-            T result = createInstance(aClass);
-
             for (Map.Entry<String, Object> entry : map.entrySet()) {
                 Field field = aClass.getDeclaredField(entry.getKey());
                 field.setAccessible(true);
@@ -57,6 +48,24 @@ public class MapToObjectConverter {
         } catch (IllegalAccessException | NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static <T> T singleBasicValue(Map<String, Object> map, Class<T> aClass) {
+        if (map.isEmpty()) {
+            throw exception("Cannot convert empty map to single basic type '%s'", aClass.getName());
+        }
+        if (map.size() != 1) {
+            throw exception("Cannot convert non-singleton map to single basic type '%s'. Keys found: '%s'", aClass.getName(), map.keySet().stream().collect(joining("', '")));
+        }
+
+        @SuppressWarnings("unchecked")
+        T result = (T) map.values().stream().findFirst().get();
+
+        if (!aClass.isInstance(result)) {
+            throw exception("Cannot convert type '%s' to basic type '%s'", result.getClass().getName(), aClass.getName());
+        }
+
+        return result;
     }
 
     private static IllegalArgumentException exception(String message, Object... args) {

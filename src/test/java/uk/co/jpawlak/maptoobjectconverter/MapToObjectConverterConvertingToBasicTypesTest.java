@@ -8,6 +8,7 @@ import org.junit.rules.ExpectedException;
 import java.util.Map;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 
@@ -24,7 +25,7 @@ public class MapToObjectConverterConvertingToBasicTypesTest {
     // mapping to unboxed primitives ///////////////////////////////////////////////////////////////////////////////////
 
     @Test
-    public void convertsSingletonMapToUnboxedChar() {
+    public void throwsExceptionWhenTryingToConvertSingletonMapToUnboxedChar() {
         Map<String, Object> map = singletonMap("randomTextIgnoredByConverter_1", 'c');
 
         expectedException.expect(IllegalArgumentException.class);
@@ -34,7 +35,7 @@ public class MapToObjectConverterConvertingToBasicTypesTest {
     }
 
     @Test
-    public void convertsSingletonMapToUnboxedBoolean() {
+    public void throwsExceptionWhenTryingToConvertSingletonMapToUnboxedBoolean() {
         Map<String, Object> map = singletonMap("randomTextIgnoredByConverter_2", true);
 
         expectedException.expect(IllegalArgumentException.class);
@@ -44,7 +45,7 @@ public class MapToObjectConverterConvertingToBasicTypesTest {
     }
 
     @Test
-    public void convertsSingletonMapToUnboxedByte() {
+    public void throwsExceptionWhenTryingToConvertSingletonMapToUnboxedByte() {
         Map<String, Object> map = singletonMap("randomTextIgnoredByConverter_3", (byte) 5);
 
         expectedException.expect(IllegalArgumentException.class);
@@ -54,7 +55,7 @@ public class MapToObjectConverterConvertingToBasicTypesTest {
     }
 
     @Test
-    public void convertsSingletonMapToUnboxedShort() {
+    public void throwsExceptionWhenTryingToConvertSingletonMapToUnboxedShort() {
         Map<String, Object> map = singletonMap("randomTextIgnoredByConverter_4", (short) 10);
 
         expectedException.expect(IllegalArgumentException.class);
@@ -64,7 +65,7 @@ public class MapToObjectConverterConvertingToBasicTypesTest {
     }
 
     @Test
-    public void convertsSingletonMapToUnboxedInt() {
+    public void throwsExceptionWhenTryingToConvertSingletonMapToUnboxedInt() {
         Map<String, Object> map = singletonMap("randomTextIgnoredByConverter_5", 15);
 
         expectedException.expect(IllegalArgumentException.class);
@@ -74,7 +75,7 @@ public class MapToObjectConverterConvertingToBasicTypesTest {
     }
 
     @Test
-    public void convertsSingletonMapToUnboxedLong() {
+    public void throwsExceptionWhenTryingToConvertSingletonMapToUnboxedLong() {
         Map<String, Object> map = singletonMap("randomTextIgnoredByConverter_6", 20L);
 
         expectedException.expect(IllegalArgumentException.class);
@@ -84,7 +85,7 @@ public class MapToObjectConverterConvertingToBasicTypesTest {
     }
 
     @Test
-    public void convertsSingletonMapToUnboxedFloat() {
+    public void throwsExceptionWhenTryingToConvertSingletonMapToUnboxedFloat() {
         Map<String, Object> map = singletonMap("randomTextIgnoredByConverter_7", 0.125f);
 
         expectedException.expect(IllegalArgumentException.class);
@@ -94,7 +95,7 @@ public class MapToObjectConverterConvertingToBasicTypesTest {
     }
 
     @Test
-    public void convertsSingletonMapToUnboxedDouble() {
+    public void throwsExceptionWhenTryingToConvertSingletonMapToUnboxedDouble() {
         Map<String, Object> map = singletonMap("randomTextIgnoredByConverter_8", 0.0625d);
 
         expectedException.expect(IllegalArgumentException.class);
@@ -189,11 +190,21 @@ public class MapToObjectConverterConvertingToBasicTypesTest {
     }
 
     @Test
-    public void throwsExceptionForNonSingletonMap() {
+    public void throwsExceptionForNonSingletonNotEmptyMap() {
         Map<String, Object> map = ImmutableMap.of("key1", "value1", "key2", "value2");
 
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Cannot map non-singleton map to single basic type 'java.lang.String'. Keys found: 'key1', 'key2'");
+        expectedException.expectMessage("Cannot convert non-singleton map to single basic type 'java.lang.String'. Keys found: 'key1', 'key2'");
+
+        mapToObjectConverter.convert(map, String.class);
+    }
+
+    @Test
+    public void throwsExceptionForEmptyMap() {
+        Map<String, Object> map = emptyMap();
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Cannot convert empty map to single basic type 'java.lang.String'");
 
         mapToObjectConverter.convert(map, String.class);
     }
