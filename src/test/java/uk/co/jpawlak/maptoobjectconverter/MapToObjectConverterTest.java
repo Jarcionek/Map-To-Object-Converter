@@ -14,7 +14,6 @@ public class MapToObjectConverterTest {
     private final MapToObjectConverter mapToObjectConverter = new MapToObjectConverter();
 
 
-
     public static class SimpleClass {
         String propertyName;
     }
@@ -75,8 +74,89 @@ public class MapToObjectConverterTest {
     }
 
 
+
+    public static class ClassWithBoxedPrimitiveDataTypes {
+        Character _character;
+        Boolean _boolean;
+        Byte _byte;
+        Short _short;
+        Integer _integer;
+        Long _long;
+        Float _float;
+        Double _double;
+    }
+
+    @Test
+    public void handlesAllBoxedPrimitiveDataTypes() {
+        Map<String, Object> map = ImmutableMap.<String, Object>builder()
+                .put("_character", 'a')
+                .put("_boolean", true)
+                .put("_byte", (byte) 1)
+                .put("_short", (short) 2)
+                .put("_integer", 3)
+                .put("_long", 4L)
+                .put("_float", 0.5f)
+                .put("_double", 0.25d)
+                .build();
+
+        ClassWithBoxedPrimitiveDataTypes actual = mapToObjectConverter.convert(map, ClassWithBoxedPrimitiveDataTypes.class);
+
+        ClassWithBoxedPrimitiveDataTypes expected = new ClassWithBoxedPrimitiveDataTypes();
+        expected._character = 'a';
+        expected._boolean = true;
+        expected._byte = 1;
+        expected._short = 2;
+        expected._integer = 3;
+        expected._long = 4L;
+        expected._float = 0.5f;
+        expected._double = 0.25d;
+
+        assertThat(actual, sameBeanAs(expected));
+    }
+
+
+
+    public static class ClassWithUnboxedPrimitiveDataTypes {
+        char _character;
+        boolean _boolean;
+        byte _byte;
+        short _short;
+        int _integer;
+        long _long;
+        float _float;
+        double _double;
+    }
+
+    @Test
+    public void handlesAllUnboxedPrimitiveDataTypes() {
+        Map<String, Object> map = ImmutableMap.<String, Object>builder()
+                .put("_character", 'a')
+                .put("_boolean", true)
+                .put("_byte", (byte) 1)
+                .put("_short", (short) 2)
+                .put("_integer", 3)
+                .put("_long", 4L)
+                .put("_float", 0.5f)
+                .put("_double", 0.25d)
+                .build();
+
+        ClassWithUnboxedPrimitiveDataTypes actual = mapToObjectConverter.convert(map, ClassWithUnboxedPrimitiveDataTypes.class);
+
+        ClassWithUnboxedPrimitiveDataTypes expected = new ClassWithUnboxedPrimitiveDataTypes();
+        expected._character = 'a';
+        expected._boolean = true;
+        expected._byte = 1;
+        expected._short = 2;
+        expected._integer = 3;
+        expected._long = 4L;
+        expected._float = 0.5f;
+        expected._double = 0.25d;
+
+        assertThat(actual, sameBeanAs(expected));
+    }
+
+
     //TODO: sets final fields
-    //TODO: support for various types (numbers - primitives and boxed, string)
     //TODO: support for jdbi specific types (Timestamp, what else?) - configurable?
     //TODO: mapping to boxed primitives for singleton maps
     //TODO: requires Optional field for null values
