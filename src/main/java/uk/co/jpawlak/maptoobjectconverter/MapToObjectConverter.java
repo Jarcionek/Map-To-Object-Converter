@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.Optional;
 
 public class MapToObjectConverter {
 
@@ -18,7 +19,19 @@ public class MapToObjectConverter {
             for (Map.Entry<String, Object> entry : map.entrySet()) {
                 Field field = aClass.getDeclaredField(entry.getKey());
                 field.setAccessible(true);
-                field.set(result, entry.getValue());
+                if (entry.getValue() == null) {
+                    if (field.getType() == Optional.class) {
+                        field.set(result, Optional.empty());
+                    } else {
+                        throw new IllegalArgumentException(String.format("field '%s' was null, make it Optional", field.getName()));
+                    }
+                } else {
+                    if (field.getType() == Optional.class) {
+                        field.set(result, Optional.of(entry.getValue()));
+                    } else {
+                        field.set(result, entry.getValue());
+                    }
+                }
             }
 
             return result;

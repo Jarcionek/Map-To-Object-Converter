@@ -1,18 +1,26 @@
 package uk.co.jpawlak.maptoobjectconverter;
 
 import com.google.common.collect.ImmutableMap;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 
+//@SuppressWarnings("unused") // classes declared here are used via reflection API
 public class MapToObjectConverterTest {
 
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
+
     private final MapToObjectConverter mapToObjectConverter = new MapToObjectConverter();
+
 
 
     public static class SimpleClass {
@@ -177,7 +185,6 @@ public class MapToObjectConverterTest {
 
 
     public static class ClassWithFinalField {
-        @SuppressWarnings("unused") // used via reflection API
         private final String string;
         public ClassWithFinalField(String string) {
             this.string = string;
@@ -196,9 +203,55 @@ public class MapToObjectConverterTest {
     }
 
 
+
+    private static class ClassWithNonOptionalField {
+        String address;
+    }
+
+    @Test
+    public void throwsExceptionWhenValueIsNull() {
+        Map<String, Object> map = singletonMap("address", null);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("field 'address' was null, make it Optional");
+
+        mapToObjectConverter.convert(map, ClassWithNonOptionalField.class);
+    }
+
+
+
+    private static class ClassWithOptionalField {
+        Optional<String> optionalAddress;
+    }
+
+    @Test
+    public void setsOptionalEmptyWhenValueIsNull() {
+        Map<String, Object> map = singletonMap("optionalAddress", null);
+
+        ClassWithOptionalField actual = mapToObjectConverter.convert(map, ClassWithOptionalField.class);
+
+        ClassWithOptionalField expected = new ClassWithOptionalField();
+        expected.optionalAddress = Optional.empty();
+
+        assertThat(actual, sameBeanAs(expected));
+    }
+
+    @Test
+    public void setsOptionalOfTheValueWhenValueIsNotNull() {
+        Map<String, Object> map = singletonMap("optionalAddress", "123");
+
+        ClassWithOptionalField actual = mapToObjectConverter.convert(map, ClassWithOptionalField.class);
+
+        ClassWithOptionalField expected = new ClassWithOptionalField();
+        expected.optionalAddress = Optional.of("123");
+
+        assertThat(actual, sameBeanAs(expected));
+    }
+
+
+
     //TODO: support for jdbi specific types (Timestamp, what else?) - configurable?
     //TODO: mapping to boxed primitives for singleton maps
-    //TODO: requires Optional field for null values
     //TODO: type safety for generics in optionals
     //TODO: number of fields = keySet().size()
     //TODO: class with inheritance
