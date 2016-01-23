@@ -356,7 +356,6 @@ public class MapToObjectConverterTest {
         mapToObjectConverter.convert(map, ClassWithNonOptionalFields.class);
     }
 
-    //TODO: type safety for generics in optionals
     //TODO: class with inheritance
     //TODO: class with inheritance - check for duplicate names
     //TODO: check for static fields

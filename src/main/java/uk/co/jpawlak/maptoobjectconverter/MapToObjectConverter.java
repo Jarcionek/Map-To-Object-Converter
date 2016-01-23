@@ -1,10 +1,12 @@
 package uk.co.jpawlak.maptoobjectconverter;
 
 import sun.reflect.ReflectionFactory;
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -114,7 +116,7 @@ public class MapToObjectConverter {
             Field field = field(aClass, entry.getKey());
 
             if (field.getType() == Optional.class) {
-                setField(result, field, Optional.ofNullable(entry.getValue()));
+                setOptionalField(result, field, entry.getValue());
             } else {
                 setField(result, field, entry.getValue());
             }
@@ -126,6 +128,23 @@ public class MapToObjectConverter {
             return aClass.getDeclaredField(fieldName);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static void setOptionalField(Object object, Field field, Object value) {
+        if (value == null) {
+            setField(object, field, Optional.empty());
+        } else {
+            Type genericType = ((ParameterizedTypeImpl) field.getGenericType()).getActualTypeArguments()[0];
+            if (!(genericType instanceof Class<?>)) {
+                throw exception("Wildcards are not supported. Field '%s' is 'Optional<%s>'", field.getName(), genericType);
+            }
+
+            if (value.getClass() != genericType) {
+                throw exception("Cannot assign value of type 'Optional<%s>' to field '%s' of type 'Optional<%s>'", value.getClass().getName(), field.getName(), genericType.getTypeName());
+            }
+
+            setField(object, field, Optional.of(value));
         }
     }
 

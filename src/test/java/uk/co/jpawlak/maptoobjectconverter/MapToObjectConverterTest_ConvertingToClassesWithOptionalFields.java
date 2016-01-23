@@ -48,4 +48,46 @@ public class MapToObjectConverterTest_ConvertingToClassesWithOptionalFields {
         assertThat(actual, sameBeanAs(expected));
     }
 
+    @Test
+    public void throwsExceptionForTypeMismatch() {
+        Map<String, Object> map = singletonMap("optionalAddress", 123);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Cannot assign value of type 'Optional<java.lang.Integer>' to field 'optionalAddress' of type 'Optional<java.lang.String>'");
+
+        mapToObjectConverter.convert(map, ClassWithOptionalField.class);
+    }
+
+
+
+    private static class ClassWithOptionalWildcardField {
+        Optional<?> x;
+    }
+
+    @Test
+    public void throwsExceptionForClassWithOptionalWildcardField() {
+        Map<String, Object> map = singletonMap("x", "abc");
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Wildcards are not supported. Field 'x' is 'Optional<?>'");
+
+        mapToObjectConverter.convert(map, ClassWithOptionalWildcardField.class);
+    }
+
+
+
+    private static class ClassWithOptionalBoundedWildcardField<T extends Number> {
+        Optional<T> x;
+    }
+
+    @Test
+    public void throwsExceptionForClassWithOptionalBoundedWildcardField() {
+        Map<String, Object> map = singletonMap("x", "abc");
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Wildcards are not supported. Field 'x' is 'Optional<T>'");
+
+        mapToObjectConverter.convert(map, ClassWithOptionalBoundedWildcardField.class);
+    }
+
 }
