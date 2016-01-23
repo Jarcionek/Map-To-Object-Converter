@@ -8,7 +8,10 @@ public class MapToObjectConverter {
     public <T> T convert(Map<String, Object> map, Class<T> aClass) {
         try {
             T result = aClass.getConstructor().newInstance();
-            aClass.getDeclaredField("propertyName").set(result, "stringValue");
+
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                aClass.getDeclaredField(entry.getKey()).set(result, entry.getValue());
+            }
 
             return result;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | NoSuchFieldException e) {

@@ -32,6 +32,33 @@ public class MapToObjectConverterTest {
         assertThat(actual, sameBeanAs(expected));
     }
 
+
+
+    public static class ClassWithMultipleFields {
+        String one;
+        String two;
+        String three;
+    }
+
+    @Test
+    public void convertsMapToObjectOfSpecifiedClassWithMultipleFields() {
+        Map<String, Object> map = ImmutableMap.of(
+                "one", "1",
+                "two", "2",
+                "three", "3"
+        );
+
+        ClassWithMultipleFields actual = mapToObjectConverter.convert(map, ClassWithMultipleFields.class);
+
+        ClassWithMultipleFields expected = new ClassWithMultipleFields();
+        expected.one = "1";
+        expected.two = "2";
+        expected.three = "3";
+
+        assertThat(actual, sameBeanAs(expected));
+    }
+
+
     //TODO: doesn't call constructor
     //TODO: sets final fields
     //TODO: support for various types (numbers - primitives and boxed, string)
