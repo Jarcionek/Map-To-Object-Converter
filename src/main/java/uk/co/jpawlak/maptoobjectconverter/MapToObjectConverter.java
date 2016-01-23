@@ -16,19 +16,19 @@ public class MapToObjectConverter {
 
     public <T> T convert(Map<String, Object> map, Class<T> aClass) {
         if (aClass.isPrimitive()) {
-            throw new IllegalArgumentException("Converting to unboxed primitives types is not supported, use boxed primitive type instead");
+            throw exception("Converting to unboxed primitives types is not supported, use boxed primitive type instead");
         }
 
         try {
             if (isBasicType(aClass)) {
                 if (map.size() != 1) {
-                    throw new IllegalArgumentException(String.format("Cannot map non-singleton map to single basic type '%s'. Keys found: '%s'", String.class.getSimpleName(), map.keySet().stream().collect(joining("', '"))));
+                    throw exception("Cannot map non-singleton map to single basic type '%s'. Keys found: '%s'", String.class.getSimpleName(), map.keySet().stream().collect(joining("', '")));
                 } else {
                     T t = (T) map.values().stream().findFirst().get();
                     if (aClass.isInstance(t)) {
                         return t;
                     } else {
-                        throw new IllegalArgumentException(String.format("Cannot convert type '%s' to basic type '%s'", t.getClass().getSimpleName(), aClass.getSimpleName()));
+                        throw exception("Cannot convert type '%s' to basic type '%s'", t.getClass().getSimpleName(), aClass.getSimpleName());
                     }
                 }
             }
@@ -42,7 +42,7 @@ public class MapToObjectConverter {
                     if (field.getType() == Optional.class) {
                         field.set(result, Optional.empty());
                     } else {
-                        throw new IllegalArgumentException(String.format("field '%s' was null, make it Optional", field.getName()));
+                        throw exception("field '%s' was null, make it Optional", field.getName());
                     }
                 } else {
                     if (field.getType() == Optional.class) {
@@ -57,6 +57,10 @@ public class MapToObjectConverter {
         } catch (IllegalAccessException | NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static IllegalArgumentException exception(String message, Object... args) {
+        return new IllegalArgumentException(String.format(message,  args));
     }
 
     private static boolean isBasicType(Class<?> aClass) {
