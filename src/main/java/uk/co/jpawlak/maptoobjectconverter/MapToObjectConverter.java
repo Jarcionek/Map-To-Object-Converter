@@ -6,6 +6,7 @@ import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -123,7 +124,8 @@ public class MapToObjectConverter {
             fields = Stream.concat(fields, Arrays.stream(aClass.getDeclaredFields()));
             aClass = aClass.getSuperclass();
         }
-        return fields;
+        return fields
+                .filter(field -> (field.getModifiers() & Modifier.STATIC) == 0);
     }
 
     private static void setOptionalField(Object object, Field field, Object value) {
