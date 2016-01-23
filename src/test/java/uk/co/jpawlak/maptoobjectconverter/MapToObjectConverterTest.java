@@ -5,6 +5,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -229,18 +230,33 @@ public class MapToObjectConverterTest {
 
 
 
-    private static class ClassWithNonOptionalField {
-        String address;
+    private static class ClassWithNonOptionalFields {
+        String street;
+        String postcode;
     }
 
     @Test
-    public void throwsExceptionWhenValueIsNull() {
-        Map<String, Object> map = singletonMap("address", null);
+    public void throwsExceptionWhenSingleValueIsNull() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("street", null);
+        map.put("postcode", "ABC 123");
 
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("field 'address' was null, make it Optional");
+        expectedException.expectMessage("Null values require fields to be Optional. Null values for fields: 'street'");
 
-        mapToObjectConverter.convert(map, ClassWithNonOptionalField.class);
+        mapToObjectConverter.convert(map, ClassWithNonOptionalFields.class);
+    }
+
+    @Test
+    public void throwsExceptionWhenMultipleValuesAreNull() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("street", null);
+        map.put("postcode", null);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Null values require fields to be Optional. Null values for fields: 'street', 'postcode'");
+
+        mapToObjectConverter.convert(map, ClassWithNonOptionalFields.class);
     }
 
 
@@ -275,7 +291,6 @@ public class MapToObjectConverterTest {
 
 
 
-    //TODO: optionals - differ between null value and no value at all
     //TODO: type safety for generics in optionals
     //TODO: class with inheritance
     //TODO: class with inheritance - check for duplicate names

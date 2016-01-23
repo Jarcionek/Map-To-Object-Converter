@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
@@ -28,6 +29,7 @@ public class MapToObjectConverter {
         }
 
         checkKeysEqualToFieldsNames(map.keySet(), aClass);
+        checkOptionalFieldsForNullValues(map, aClass);
 
         T result = createInstance(aClass);
 
@@ -50,10 +52,10 @@ public class MapToObjectConverter {
 
     private static <T> T singleBasicValue(Map<String, Object> map, Class<T> aClass) {
         if (map.isEmpty()) {
-            throw exception("Cannot convert empty map to single basic type '%s'", aClass.getName());
+            throw exception("Cannot convert empty map to single basic value of type '%s'", aClass.getName());
         }
         if (map.size() != 1) {
-            throw exception("Cannot convert non-singleton map to single basic type '%s'. Keys found: '%s'", aClass.getName(), map.keySet().stream().collect(joining("', '")));
+            throw exception("Cannot convert non-singleton map to single basic value of type '%s'. Keys found: '%s'", aClass.getName(), map.keySet().stream().collect(joining("', '")));
         }
 
         @SuppressWarnings("unchecked")
@@ -80,6 +82,17 @@ public class MapToObjectConverter {
         }
     }
 
+    private static void checkOptionalFieldsForNullValues(Map<String, Object> map, Class<?> aClass) {
+        Set<String> fieldsNames = map.entrySet().stream()
+                .filter(entry -> entry.getValue() == null && field(aClass, entry.getKey()).getType() != Optional.class)
+                .map(Entry::getKey)
+                .collect(toCollection(LinkedHashSet::new));
+
+        if (!fieldsNames.isEmpty()) {
+            throw exception("Null values require fields to be Optional. Null values for fields: '%s'", fieldsNames.stream().collect(joining("', '")));
+        }
+    }
+
     private static Set<String> fieldsNamesOf(Class<?> aClass) {
         return stream(aClass.getDeclaredFields())
                 .map(Field::getName)
@@ -97,20 +110,13 @@ public class MapToObjectConverter {
     }
 
     private static <T> void setFields(Map<String, Object> map, Class<T> aClass, T result) {
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
+        for (Entry<String, Object> entry : map.entrySet()) {
             Field field = field(aClass, entry.getKey());
-            if (entry.getValue() == null) {
-                if (field.getType() == Optional.class) {
-                    setField(result, field, Optional.empty());
-                } else {
-                    throw exception("field '%s' was null, make it Optional", field.getName());
-                }
+
+            if (field.getType() == Optional.class) {
+                setField(result, field, Optional.ofNullable(entry.getValue()));
             } else {
-                if (field.getType() == Optional.class) {
-                    setField(result, field, Optional.of(entry.getValue()));
-                } else {
-                    setField(result, field, entry.getValue());
-                }
+                setField(result, field, entry.getValue());
             }
         }
     }

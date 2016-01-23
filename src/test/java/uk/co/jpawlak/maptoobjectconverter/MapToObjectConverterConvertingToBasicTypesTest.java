@@ -194,7 +194,7 @@ public class MapToObjectConverterConvertingToBasicTypesTest {
         Map<String, Object> map = ImmutableMap.of("key1", "value1", "key2", "value2");
 
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Cannot convert non-singleton map to single basic type 'java.lang.String'. Keys found: 'key1', 'key2'");
+        expectedException.expectMessage("Cannot convert non-singleton map to single basic value of type 'java.lang.String'. Keys found: 'key1', 'key2'");
 
         mapToObjectConverter.convert(map, String.class);
     }
@@ -204,7 +204,7 @@ public class MapToObjectConverterConvertingToBasicTypesTest {
         Map<String, Object> map = emptyMap();
 
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Cannot convert empty map to single basic type 'java.lang.String'");
+        expectedException.expectMessage("Cannot convert empty map to single basic value of type 'java.lang.String'");
 
         mapToObjectConverter.convert(map, String.class);
     }
