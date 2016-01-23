@@ -133,6 +133,8 @@ public class MapToObjectConverter {
         try {
             field.setAccessible(true);
             field.set(object, value);
+        } catch (IllegalArgumentException e) {
+            throw exception("Cannot assign value of type '%s' to field '%s' of type '%s'", value.getClass().getName(), field.getName(), field.getType().getName());
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }

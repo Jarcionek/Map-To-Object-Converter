@@ -28,9 +28,7 @@ public class MapToObjectConverterTest {
 
     @Test
     public void convertsMapToObjectOfSpecifiedClass() {
-        Map<String, Object> map = ImmutableMap.of(
-                "propertyName", "stringValue"
-        );
+        Map<String, Object> map = singletonMap("propertyName", "stringValue");
 
         SimpleClass actual = mapToObjectConverter.convert(map, SimpleClass.class);
 
@@ -38,6 +36,106 @@ public class MapToObjectConverterTest {
         expected.propertyName = "stringValue";
 
         assertThat(actual, sameBeanAs(expected));
+    }
+
+    @Test
+    public void throwsExceptionForTypeMismatch() {
+        Map<String, Object> map = singletonMap("propertyName", 3);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Cannot assign value of type 'java.lang.Integer' to field 'propertyName' of type 'java.lang.String'");
+
+        mapToObjectConverter.convert(map, SimpleClass.class);
+    }
+
+
+
+    public static class SimpleClassWithPrimitiveField {
+        int number;
+    }
+
+    public static class SimpleClassWithPrimitiveBooleanField {
+        boolean trueOrFalse;
+    }
+
+    @Test
+    public void throwsExceptionForPrimitiveTypeMismatch_assigningChar() {
+        Map<String, Object> map = singletonMap("trueOrFalse", 'x');
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Cannot assign value of type 'java.lang.Character' to field 'trueOrFalse' of type 'boolean'");
+
+        mapToObjectConverter.convert(map, SimpleClassWithPrimitiveBooleanField.class);
+    }
+
+    @Test
+    public void throwsExceptionForPrimitiveTypeMismatch_assigningBoolean() {
+        Map<String, Object> map = singletonMap("number", true);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Cannot assign value of type 'java.lang.Boolean' to field 'number' of type 'int'");
+
+        mapToObjectConverter.convert(map, SimpleClassWithPrimitiveField.class);
+    }
+
+    @Test
+    public void throwsExceptionForPrimitiveTypeMismatch_assigningByte() {
+        Map<String, Object> map = singletonMap("trueOrFalse", (byte) 1);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Cannot assign value of type 'java.lang.Byte' to field 'trueOrFalse' of type 'boolean'");
+
+        mapToObjectConverter.convert(map, SimpleClassWithPrimitiveBooleanField.class);
+    }
+
+    @Test
+    public void throwsExceptionForPrimitiveTypeMismatch_assigningShort() {
+        Map<String, Object> map = singletonMap("trueOrFalse", (short) 2);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Cannot assign value of type 'java.lang.Short' to field 'trueOrFalse' of type 'boolean'");
+
+        mapToObjectConverter.convert(map, SimpleClassWithPrimitiveBooleanField.class);
+    }
+
+    @Test
+    public void throwsExceptionForPrimitiveTypeMismatch_assigningInteger() {
+        Map<String, Object> map = singletonMap("trueOrFalse", 3);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Cannot assign value of type 'java.lang.Integer' to field 'trueOrFalse' of type 'boolean'");
+
+        mapToObjectConverter.convert(map, SimpleClassWithPrimitiveBooleanField.class);
+    }
+
+    @Test
+    public void throwsExceptionForPrimitiveTypeMismatch_assigningLong() {
+        Map<String, Object> map = singletonMap("number", 4L);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Cannot assign value of type 'java.lang.Long' to field 'number' of type 'int'");
+
+        mapToObjectConverter.convert(map, SimpleClassWithPrimitiveField.class);
+    }
+
+    @Test
+    public void throwsExceptionForPrimitiveTypeMismatch_assigningFloat() {
+        Map<String, Object> map = singletonMap("number", 0.5f);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Cannot assign value of type 'java.lang.Float' to field 'number' of type 'int'");
+
+        mapToObjectConverter.convert(map, SimpleClassWithPrimitiveField.class);
+    }
+
+    @Test
+    public void throwsExceptionForPrimitiveTypeMismatch_assigningDouble() {
+        Map<String, Object> map = singletonMap("number", 0.25d);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Cannot assign value of type 'java.lang.Double' to field 'number' of type 'int'");
+
+        mapToObjectConverter.convert(map, SimpleClassWithPrimitiveField.class);
     }
 
 
@@ -121,7 +219,7 @@ public class MapToObjectConverterTest {
     }
 
     @Test
-    public void handlesAllBoxedPrimitiveDataTypes() {
+    public void setsBoxedPrimitiveFields() {
         Map<String, Object> map = ImmutableMap.<String, Object>builder()
                 .put("_character", 'a')
                 .put("_boolean", true)
@@ -162,7 +260,7 @@ public class MapToObjectConverterTest {
     }
 
     @Test
-    public void handlesAllUnboxedPrimitiveDataTypes() {
+    public void setsUnboxedPrimitiveFields() {
         Map<String, Object> map = ImmutableMap.<String, Object>builder()
                 .put("_character", 'a')
                 .put("_boolean", true)
@@ -263,7 +361,7 @@ public class MapToObjectConverterTest {
     //TODO: class with inheritance - check for duplicate names
     //TODO: check for static fields
     //TODO: check for synthetic fields
-    //TODO: support for non-primitive types - configurable
+    //TODO: support for non-primitive types - configurable (don't allow to set mappers for String, boxed primitives and Optional)
     //TODO: ignores characters case in fields names (configurable?) - currently case sensitive and untested
 
 }
