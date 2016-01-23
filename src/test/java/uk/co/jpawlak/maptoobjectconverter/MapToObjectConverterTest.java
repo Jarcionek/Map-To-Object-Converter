@@ -32,4 +32,16 @@ public class MapToObjectConverterTest {
         assertThat(actual, sameBeanAs(expected));
     }
 
+    //TODO: doesn't call constructor
+    //TODO: sets final fields
+    //TODO: support for various types (numbers - primitives and boxed, string)
+    //TODO: support for jdbi specific types (Timestamp, what else?) - configurable?
+    //TODO: mapping to boxed primitives for singleton maps
+    //TODO: requires Optional field for null values
+    //TODO: type safety for generics in optionals
+    //TODO: number of fields = keySet().size()
+    //TODO: class with inheritance
+    //TODO: ignores static fields
+    //TODO: ignores characters case in fields names (configurable)
+
 }
