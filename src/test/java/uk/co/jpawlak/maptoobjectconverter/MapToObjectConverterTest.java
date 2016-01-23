@@ -253,6 +253,7 @@ public class MapToObjectConverterTest {
     //TODO: type safety for generics in optionals
     //TODO: number of fields = keySet().size()
     //TODO: class with inheritance
+    //TODO: class with inheritance - check for duplicate names
     //TODO: ignores static fields
     //TODO: ignores characters case in fields names (configurable)
 
