@@ -7,13 +7,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
-import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toCollection;
 
@@ -71,7 +71,9 @@ public class MapToObjectConverter {
     }
 
     private static void checkKeysEqualToFieldsNames(Set<String> keys, Class<?> aClass) {
-        Set<String> fieldsNames = fieldsNamesOf(aClass);
+        Set<String> fieldsNames = fieldsOf(aClass)
+                .map(Field::getName)
+                .collect(toCollection(LinkedHashSet::new));
 
         Set<String> missingFields = keys.stream().filter(key -> !fieldsNames.contains(key)).collect(toCollection(LinkedHashSet::new));
         if (!missingFields.isEmpty()) {
@@ -85,20 +87,14 @@ public class MapToObjectConverter {
     }
 
     private static void checkOptionalFieldsForNullValues(Map<String, Object> map, Class<?> aClass) {
-        Set<String> fieldsNames = map.entrySet().stream()
-                .filter(entry -> entry.getValue() == null && field(aClass, entry.getKey()).getType() != Optional.class)
-                .map(Entry::getKey)
+        Set<String> fieldsNames = fieldsOf(aClass)
+                .filter(field -> field .getType() != Optional.class && map.get(field.getName()) == null)
+                .map(Field::getName)
                 .collect(toCollection(LinkedHashSet::new));
 
         if (!fieldsNames.isEmpty()) {
             throw exception("Null values require fields to be Optional. Null values for fields: '%s'", fieldsNames.stream().collect(joining("', '")));
         }
-    }
-
-    private static Set<String> fieldsNamesOf(Class<?> aClass) {
-        return stream(aClass.getDeclaredFields())
-                .map(Field::getName)
-                .collect(toCollection(LinkedHashSet::new));
     }
 
     private static <T> T createInstance(Class<T> aClass) {
@@ -112,23 +108,22 @@ public class MapToObjectConverter {
     }
 
     private static <T> void setFields(Map<String, Object> map, Class<T> aClass, T result) {
-        for (Entry<String, Object> entry : map.entrySet()) {
-            Field field = field(aClass, entry.getKey());
-
+        fieldsOf(aClass).forEach(field -> {
             if (field.getType() == Optional.class) {
-                setOptionalField(result, field, entry.getValue());
+                setOptionalField(result, field, map.get(field.getName()));
             } else {
-                setField(result, field, entry.getValue());
+                setField(result, field, map.get(field.getName()));
             }
-        }
+        });
     }
 
-    private static Field field(Class<?> aClass, String fieldName) {
-        try {
-            return aClass.getDeclaredField(fieldName);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
+    private static Stream<Field> fieldsOf(Class<?> aClass) {
+        Stream<Field> fields = Stream.empty();
+        while (aClass != Object.class) {
+            fields = Stream.concat(fields, Arrays.stream(aClass.getDeclaredFields()));
+            aClass = aClass.getSuperclass();
         }
+        return fields;
     }
 
     private static void setOptionalField(Object object, Field field, Object value) {

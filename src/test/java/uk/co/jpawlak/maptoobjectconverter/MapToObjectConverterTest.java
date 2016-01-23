@@ -355,8 +355,33 @@ public class MapToObjectConverterTest {
 
         mapToObjectConverter.convert(map, ClassWithNonOptionalFields.class);
     }
+    
+    
+    
+    private static class ParentClass {
+        int a;
+    }
+    
+    private static class ChildClass extends ParentClass {
+        int b;
+    }
+    
+    @Test
+    public void considersFieldsInSuperClasses() {
+        Map<String, Object> map = ImmutableMap.of(
+                "a", 1,
+                "b", 2
+        );
 
-    //TODO: class with inheritance
+        ChildClass actual = mapToObjectConverter.convert(map, ChildClass.class);
+
+        ChildClass expected = new ChildClass();
+        expected.a = 1;
+        expected.b = 2;
+
+        assertThat(actual, sameBeanAs(expected));
+    }
+
     //TODO: class with inheritance - check for duplicate names
     //TODO: check for static fields
     //TODO: check for synthetic fields
