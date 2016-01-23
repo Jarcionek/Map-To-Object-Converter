@@ -12,6 +12,7 @@ import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 public class MapToObjectConverterTest {
 
@@ -382,7 +383,27 @@ public class MapToObjectConverterTest {
         assertThat(actual, sameBeanAs(expected));
     }
 
-    //TODO: class with inheritance - check for duplicate names
+
+
+    private static class ChildClassWithRepeatedFieldName extends ParentClass {
+        int a;
+        public int getSuperA() {
+            return super.a;
+        }
+    }
+
+    @Test
+    public void setsAllFieldsOfTheSameNameIfThereAreDuplicatedInSuperClasses() {
+        Map<String, Object> map = ImmutableMap.of(
+                "a", 7
+        );
+
+        ChildClassWithRepeatedFieldName actual = mapToObjectConverter.convert(map, ChildClassWithRepeatedFieldName.class);
+
+        assertThat(actual.a, equalTo(7));
+        assertThat(actual.getSuperA(), equalTo(7));
+    }
+
     //TODO: check for static fields
     //TODO: check for synthetic fields
     //TODO: support for non-primitive types - configurable (don't allow to set mappers for String, boxed primitives and Optional)
