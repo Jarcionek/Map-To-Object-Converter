@@ -7,6 +7,7 @@ import java.util.Map;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
+import static java.util.Collections.emptyMap;
 
 public class MapToObjectConverterTest {
 
@@ -59,7 +60,21 @@ public class MapToObjectConverterTest {
     }
 
 
-    //TODO: doesn't call constructor
+
+    public static class ClassWithNotWorkingConstructor {
+        public ClassWithNotWorkingConstructor() {
+            throw new AssertionError("Unexpected call of the constructor");
+        }
+    }
+
+    @Test
+    public void createsObjectWithoutCallingItsConstructor() {
+        Map<String, Object> map = emptyMap();
+
+        mapToObjectConverter.convert(map, ClassWithNotWorkingConstructor.class);
+    }
+
+
     //TODO: sets final fields
     //TODO: support for various types (numbers - primitives and boxed, string)
     //TODO: support for jdbi specific types (Timestamp, what else?) - configurable?
