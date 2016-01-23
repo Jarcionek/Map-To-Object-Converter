@@ -431,7 +431,6 @@ public class MapToObjectConverterTest {
 
     @Test
     public void ignoresStaticFields() {
-
         Map<String, Object> map = ImmutableMap.of(
                 "y", 4
         );
@@ -444,7 +443,19 @@ public class MapToObjectConverterTest {
         assertThat(actual, sameBeanAs(expected));
     }
 
-    //TODO: check for synthetic fields
+
+
+    private static class ClassWithSyntheticField {
+        private class Inner {} // this will cause the compiler to create a field in ClassWithSyntheticField.Inner that represents the enclosing class ClassWithSyntheticField
+    }
+
+    @Test
+    public void ignoresSyntheticFields() {
+        Map<String, Object> map = emptyMap();
+
+        mapToObjectConverter.convert(map, ClassWithSyntheticField.Inner.class);
+    }
+
     //TODO: support for non-primitive types - configurable (don't allow to set mappers for String, boxed primitives and Optional)
     //TODO: ignores characters case in fields names (configurable?) - currently case sensitive and untested
 

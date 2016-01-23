@@ -125,7 +125,8 @@ public class MapToObjectConverter {
             aClass = aClass.getSuperclass();
         }
         return fields
-                .filter(field -> (field.getModifiers() & Modifier.STATIC) == 0);
+                .filter(field -> (field.getModifiers() & Modifier.STATIC) == 0)
+                .filter(field -> !field.isSynthetic());
     }
 
     private static void setOptionalField(Object object, Field field, Object value) {
