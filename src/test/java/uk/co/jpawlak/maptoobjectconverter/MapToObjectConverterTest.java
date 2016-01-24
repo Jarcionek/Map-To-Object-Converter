@@ -475,6 +475,8 @@ public class MapToObjectConverterTest {
         mapToObjectConverter.convert(map, AbstractClass.class);
     }
 
+    //TODO: add handling inheritance and interfaces in types of fields (e.g. if map has value 3, it can be set to field of type Number)
+    //TODO: add handling enums (mappers will be needed here? or maybe can be handled via interface?)
     //TODO: add readme
     //TODO: add licence
     //TODO: ignores characters case in fields names (configurable?) - currently case sensitive and untested

@@ -23,10 +23,6 @@ public class MapToObjectConverter {
     private static final ReflectionFactory REFLECTION_FACTORY = ReflectionFactory.getReflectionFactory();
 
     public <T> T convert(Map<String, Object> map, Class<T> aClass) {
-        if (aClass.isPrimitive()) {
-            throw exception("Converting to unboxed primitives types is not supported, use boxed primitive type instead");
-        }
-
         if (isSingleton(map) && typeMatches(aClass, map)) {
             return singleValueFrom(map);
         }
@@ -49,8 +45,23 @@ public class MapToObjectConverter {
         return map.values().stream()
                 .filter(value -> value != null)
                 .findFirst()
-                .map(value -> value.getClass() == aClass)
+                .map(value -> typeMatches(aClass, value.getClass()))
                 .orElse(false);
+    }
+
+    private static boolean typeMatches(Class<?> aClass, Class<?> valueClass) {
+        if (aClass.isPrimitive()) {
+            return (aClass == char.class    && valueClass == Character.class)
+                || (aClass == boolean.class && valueClass == Boolean.class)
+                || (aClass == byte.class    && valueClass == Byte.class)
+                || (aClass == short.class   && valueClass == Short.class)
+                || (aClass == int.class     && valueClass == Integer.class)
+                || (aClass == long.class    && valueClass == Long.class)
+                || (aClass == float.class   && valueClass == Float.class)
+                || (aClass == double.class  && valueClass == Double.class);
+        } else {
+            return aClass == valueClass;
+        }
     }
 
     @SuppressWarnings("unchecked")
