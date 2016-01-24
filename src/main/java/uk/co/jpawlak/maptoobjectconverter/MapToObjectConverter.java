@@ -130,13 +130,17 @@ public class MapToObjectConverter {
         if (value == null) {
             setField(object, field, Optional.empty());
         } else {
-            Type genericType = ((ParameterizedTypeImpl) field.getGenericType()).getActualTypeArguments()[0];
-            if (!(genericType instanceof Class<?>)) {
-                throw exception("Wildcards are not supported. Field '%s' is 'Optional<%s>'", field.getName(), genericType);
+            Type genericType = field.getGenericType();
+            if (!(genericType instanceof ParameterizedTypeImpl)) {
+                throw exception("Raw types are not supported. Field '%s' is 'Optional'", field.getName());
+            }
+            Type parameterType = ((ParameterizedTypeImpl) genericType).getActualTypeArguments()[0];
+            if (!(parameterType instanceof Class<?>)) {
+                throw exception("Wildcards are not supported. Field '%s' is 'Optional<%s>'", field.getName(), parameterType);
             }
 
-            if (value.getClass() != genericType) {
-                throw exception("Cannot assign value of type 'Optional<%s>' to field '%s' of type 'Optional<%s>'", value.getClass().getName(), field.getName(), genericType.getTypeName());
+            if (value.getClass() != parameterType) {
+                throw exception("Cannot assign value of type 'Optional<%s>' to field '%s' of type 'Optional<%s>'", value.getClass().getName(), field.getName(), parameterType.getTypeName());
             }
 
             setField(object, field, Optional.of(value));

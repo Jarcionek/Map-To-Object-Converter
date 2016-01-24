@@ -122,4 +122,20 @@ public class MapToObjectConverterTest_ConvertingToClassesWithOptionalFields {
         mapToObjectConverter.convert(map, ClassWithOptionalBoundedWildcardField.class);
     }
 
+
+
+    private static class ClassWithRawOptional {
+        Optional z;
+    }
+
+    @Test
+    public void throwsExceptionForClassWithRawOptional() {
+        Map<String, Object> map = singletonMap("z", "abc");
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Raw types are not supported. Field 'z' is 'Optional'");
+
+        mapToObjectConverter.convert(map, ClassWithRawOptional.class);
+    }
+
 }
