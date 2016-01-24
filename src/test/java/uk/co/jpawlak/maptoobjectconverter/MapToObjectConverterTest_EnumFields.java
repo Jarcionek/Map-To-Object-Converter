@@ -10,7 +10,7 @@ import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.singletonMap;
 
-public class MapToObjectConverterTest_ConvertingToEnums {
+public class MapToObjectConverterTest_EnumFields {
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();

@@ -13,7 +13,7 @@ import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-public class MapToObjectConverterTest_ConvertingToClassesWithOptionalFields {
+public class MapToObjectConverterTest_OptionalFields {
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
