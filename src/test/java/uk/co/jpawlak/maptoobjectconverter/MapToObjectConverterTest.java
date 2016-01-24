@@ -431,9 +431,7 @@ public class MapToObjectConverterTest {
 
     @Test
     public void ignoresStaticFields() {
-        Map<String, Object> map = ImmutableMap.of(
-                "y", 4
-        );
+        Map<String, Object> map = singletonMap("y", 4);
 
         ClassWithStaticField actual = mapToObjectConverter.convert(map, ClassWithStaticField.class);
 
@@ -475,7 +473,24 @@ public class MapToObjectConverterTest {
         mapToObjectConverter.convert(map, AbstractClass.class);
     }
 
-    //TODO: add handling inheritance and interfaces in types of fields (e.g. if map has value 3, it can be set to field of type Number)
+
+
+    private static class ClassWithAbstractField {
+        Number x;
+    }
+
+    @Test
+    public void setsFieldOfDifferentTypeThanValueIfItIsAssignable() {
+        Map<String, Object> map = singletonMap("x", 5);
+
+        ClassWithAbstractField actual = mapToObjectConverter.convert(map, ClassWithAbstractField.class);
+
+        ClassWithAbstractField expected = new ClassWithAbstractField();
+        expected.x = 5;
+
+        assertThat(actual, sameBeanAs(expected));
+    }
+
     //TODO: add handling enums (mappers will be needed here? or maybe can be handled via interface?)
     //TODO: add readme
     //TODO: add licence

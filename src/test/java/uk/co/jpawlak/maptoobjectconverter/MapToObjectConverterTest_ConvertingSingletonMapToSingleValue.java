@@ -176,6 +176,15 @@ public class MapToObjectConverterTest_ConvertingSingletonMapToSingleValue {
 
         assertThat(actual, equalTo("hello"));
     }
+
+    @Test
+    public void convertsSingletonMapToNumber() {
+        Map<String, Object> map = singletonMap("randomTextIgnoredByConverter", 3);
+
+        Number actual = mapToObjectConverter.convert(map, Number.class);
+
+        assertThat(actual, equalTo(3));
+    }
     
     
 
