@@ -5,7 +5,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
@@ -324,37 +323,6 @@ public class MapToObjectConverterTest {
         ClassWithFinalField expected = new ClassWithFinalField("value");
 
         assertThat(actual, sameBeanAs(expected));
-    }
-
-
-
-    private static class ClassWithNonOptionalFields {
-        String street;
-        String postcode;
-    }
-
-    @Test
-    public void throwsExceptionWhenSingleValueIsNull() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("street", null);
-        map.put("postcode", "ABC 123");
-
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Null values require fields to be Optional. Null values for fields: 'street'");
-
-        mapToObjectConverter.convert(map, ClassWithNonOptionalFields.class);
-    }
-
-    @Test
-    public void throwsExceptionWhenMultipleValuesAreNull() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("street", null);
-        map.put("postcode", null);
-
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Null values require fields to be Optional. Null values for fields: 'street', 'postcode'");
-
-        mapToObjectConverter.convert(map, ClassWithNonOptionalFields.class);
     }
     
     

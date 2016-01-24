@@ -4,6 +4,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -17,6 +18,37 @@ public class MapToObjectConverterTest_ConvertingToClassesWithOptionalFields {
     public final ExpectedException expectedException = ExpectedException.none();
 
     private final MapToObjectConverter mapToObjectConverter = new MapToObjectConverter();
+
+
+
+    private static class ClassWithNonOptionalFields {
+        String street;
+        String postcode;
+    }
+
+    @Test
+    public void throwsExceptionWhenSingleValueIsNull() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("street", null);
+        map.put("postcode", "ABC 123");
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Null values require fields to be Optional. Null values for fields: 'street'");
+
+        mapToObjectConverter.convert(map, ClassWithNonOptionalFields.class);
+    }
+
+    @Test
+    public void throwsExceptionWhenMultipleValuesAreNull() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("street", null);
+        map.put("postcode", null);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Null values require fields to be Optional. Null values for fields: 'street', 'postcode'");
+
+        mapToObjectConverter.convert(map, ClassWithNonOptionalFields.class);
+    }
 
 
 
