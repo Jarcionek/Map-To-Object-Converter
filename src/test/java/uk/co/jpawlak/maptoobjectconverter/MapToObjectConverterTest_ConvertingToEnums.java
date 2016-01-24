@@ -9,7 +9,6 @@ import java.util.Map;
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.singletonMap;
-import static org.hamcrest.CoreMatchers.equalTo;
 
 public class MapToObjectConverterTest_ConvertingToEnums {
 
@@ -40,16 +39,7 @@ public class MapToObjectConverterTest_ConvertingToEnums {
         assertThat(actual, sameBeanAs(expected));
     }
 
-    @Test
-    public void convertsSingletonMapToSingleEnum() {
-        Map<String, Object> map = singletonMap("thisNameShouldBeIgnored", "TWO");
-
-        MyEnum actual = mapToObjectConverter.convert(map, MyEnum.class);
-
-        assertThat(actual, equalTo(MyEnum.TWO));
-    }
-
-    //TODO: null to enum
+    //TODO: null String to enum
     //TODO: check such string for which there is no enum
     //TODO: check number -> enum
     //TODO: test mapping to enum with fields - make sure that it doesn't set fields on the enum

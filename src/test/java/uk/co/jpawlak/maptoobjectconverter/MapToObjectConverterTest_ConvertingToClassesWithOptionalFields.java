@@ -11,6 +11,7 @@ import java.util.Optional;
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.singletonMap;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 public class MapToObjectConverterTest_ConvertingToClassesWithOptionalFields {
 
@@ -85,7 +86,7 @@ public class MapToObjectConverterTest_ConvertingToClassesWithOptionalFields {
         Map<String, Object> map = singletonMap("optionalAddress", 123);
 
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Cannot assign value of type 'Optional<java.lang.Integer>' to field 'optionalAddress' of type 'Optional<java.lang.String>'");
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'Optional<java.lang.Integer>' to field 'optionalAddress' of type 'Optional<java.lang.String>'"));
 
         mapToObjectConverter.convert(map, ClassWithOptionalField.class);
     }
@@ -101,7 +102,7 @@ public class MapToObjectConverterTest_ConvertingToClassesWithOptionalFields {
         Map<String, Object> map = singletonMap("x", "abc");
 
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Wildcards are not supported. Field 'x' is 'Optional<?>'");
+        expectedException.expectMessage(equalTo("Wildcards are not supported. Field 'x' is 'Optional<?>'"));
 
         mapToObjectConverter.convert(map, ClassWithOptionalWildcardField.class);
     }
@@ -117,7 +118,7 @@ public class MapToObjectConverterTest_ConvertingToClassesWithOptionalFields {
         Map<String, Object> map = singletonMap("x", "abc");
 
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Wildcards are not supported. Field 'x' is 'Optional<T>'");
+        expectedException.expectMessage(equalTo("Wildcards are not supported. Field 'x' is 'Optional<T>'"));
 
         mapToObjectConverter.convert(map, ClassWithOptionalBoundedWildcardField.class);
     }

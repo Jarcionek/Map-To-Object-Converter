@@ -23,15 +23,6 @@ public class MapToObjectConverter {
     private static final ReflectionFactory REFLECTION_FACTORY = ReflectionFactory.getReflectionFactory();
 
     public <T> T convert(Map<String, Object> map, Class<T> aClass) {
-        if (isSingleton(map)) {
-            if (typeMatches(aClass, map)) {
-                return singleValueFrom(map);
-            }
-            if (aClass.isEnum()) {
-                return asEnum(aClass, map.values().stream().findFirst().get());
-            }
-        }
-
         checkKeysEqualToFieldsNames(map.keySet(), aClass);
         checkOptionalFieldsForNullValues(map, aClass);
 
@@ -40,35 +31,6 @@ public class MapToObjectConverter {
         setFields(map, aClass, result);
 
         return result;
-    }
-
-    private static boolean isSingleton(Map<?, ?> map) {
-        return map.size() == 1;
-    }
-
-    private static boolean typeMatches(Class<?> aClass, Map<String, ?> map) {
-        return map.values().stream()
-                .filter(value -> value != null)
-                .findFirst()
-                .map(value -> isAssignable(aClass, value.getClass()))
-                .orElse(false);
-    }
-
-    private static boolean isAssignable(Class<?> aClass, Class<?> valueClass) {
-        return aClass.isAssignableFrom(valueClass)
-                || (aClass == char.class && valueClass == Character.class)
-                || (aClass == boolean.class && valueClass == Boolean.class)
-                || (aClass == byte.class && valueClass == Byte.class)
-                || (aClass == short.class && valueClass == Short.class)
-                || (aClass == int.class && valueClass == Integer.class)
-                || (aClass == long.class && valueClass == Long.class)
-                || (aClass == float.class && valueClass == Float.class)
-                || (aClass == double.class && valueClass == Double.class);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> T singleValueFrom(Map<String, Object> map) {
-        return (T) map.values().stream().findFirst().get();
     }
 
     private static void checkKeysEqualToFieldsNames(Set<String> keys, Class<?> aClass) {
