@@ -22,19 +22,44 @@ public class MapToObjectConverter {
 
     private static final ReflectionFactory REFLECTION_FACTORY = ReflectionFactory.getReflectionFactory();
 
-    public <T> T convert(Map<String, Object> map, Class<T> aClass) {
-        checkKeysEqualToFieldsNames(map.keySet(), aClass);
-        checkOptionalFieldsForNullValues(map, aClass);
+    public <T> T convert(Map<String, Object> map, Class<T> targetClass) {
+        checkParameters(map, targetClass);
+        checkKeysEqualToFieldsNames(map.keySet(), targetClass);
+        checkOptionalFieldsForNullValues(map, targetClass);
 
-        T result = createInstance(aClass);
+        T result = createInstance(targetClass);
 
-        setFields(map, aClass, result);
+        setFields(map, targetClass, result);
 
         return result;
     }
 
-    private static void checkKeysEqualToFieldsNames(Set<String> keys, Class<?> aClass) {
-        Set<String> fieldsNames = fieldsOf(aClass)
+    private static void checkParameters(Map<?, ?> map, Class<?> targetClass) {
+        if (map == null) {
+            throw exception("Map cannot be null");
+        }
+        if (targetClass == null) {
+            throw exception("Target class cannot be null");
+        }
+        if (targetClass.isPrimitive()) {
+            throw exception("Cannot convert map to primitive type. Use boxed primitive instead");
+        }
+        if (targetClass.isEnum()) {
+            throw exception("Cannot convert map to enum");
+        }
+        if (targetClass.isAnnotation()) {
+            throw exception("Cannot convert map to annotation");
+        }
+        if (targetClass.isInterface()) {
+            throw exception("Cannot convert map to interface");
+        }
+        if ((targetClass.getModifiers() & Modifier.ABSTRACT) != 0) {
+            throw exception("Cannot convert map to abstract class");
+        }
+    }
+
+    private static void checkKeysEqualToFieldsNames(Set<String> keys, Class<?> targetClass) {
+        Set<String> fieldsNames = fieldsOf(targetClass)
                 .map(Field::getName)
                 .collect(toCollection(LinkedHashSet::new));
 
@@ -49,8 +74,8 @@ public class MapToObjectConverter {
         }
     }
 
-    private static void checkOptionalFieldsForNullValues(Map<String, Object> map, Class<?> aClass) {
-        Set<String> fieldsNames = fieldsOf(aClass)
+    private static void checkOptionalFieldsForNullValues(Map<String, Object> map, Class<?> targetClass) {
+        Set<String> fieldsNames = fieldsOf(targetClass)
                 .filter(field -> field .getType() != Optional.class && map.get(field.getName()) == null)
                 .map(Field::getName)
                 .collect(toCollection(LinkedHashSet::new));
@@ -60,22 +85,18 @@ public class MapToObjectConverter {
         }
     }
 
-    private static <T> T createInstance(Class<T> aClass) {
+    private static <T> T createInstance(Class<T> targetClass) {
         try {
-            if ((aClass.getModifiers() & Modifier.ABSTRACT) != 0) {
-                throw exception("Cannot convert map to abstract class");
-            }
-
             Constructor<Object> objectNoArgConstructor = Object.class.getDeclaredConstructor();
-            Constructor<?> constructor = REFLECTION_FACTORY.newConstructorForSerialization(aClass, objectNoArgConstructor);
-            return aClass.cast(constructor.newInstance());
+            Constructor<?> constructor = REFLECTION_FACTORY.newConstructorForSerialization(targetClass, objectNoArgConstructor);
+            return targetClass.cast(constructor.newInstance());
         } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static <T> void setFields(Map<String, Object> map, Class<T> aClass, T result) {
-        fieldsOf(aClass).forEach(field -> {
+    private static <T> void setFields(Map<String, Object> map, Class<T> targetClass, T result) {
+        fieldsOf(targetClass).forEach(field -> {
             if (field.getType() == Optional.class) {
                 setOptionalField(result, field, map.get(field.getName()));
             } else {
@@ -120,11 +141,11 @@ public class MapToObjectConverter {
         }
     }
 
-    private static Stream<Field> fieldsOf(Class<?> aClass) {
+    private static Stream<Field> fieldsOf(Class<?> targetClass) {
         Stream<Field> fields = Stream.empty();
-        while (aClass != Object.class) {
-            fields = Stream.concat(fields, Arrays.stream(aClass.getDeclaredFields()));
-            aClass = aClass.getSuperclass();
+        while (targetClass != Object.class) {
+            fields = Stream.concat(fields, Arrays.stream(targetClass.getDeclaredFields()));
+            targetClass = targetClass.getSuperclass();
         }
         return fields
                 .filter(field -> (field.getModifiers() & Modifier.STATIC) == 0)

@@ -70,8 +70,6 @@ public class MapToObjectConverterTest_EnumFields {
         mapToObjectConverter.convert(map, ClassWithEnumField.class);
     }
 
-    //TODO: test mapping to enum with fields - make sure that it doesn't set fields on the enum
-
     //TODO: optional - correct enum
     //TODO: optional - string with no enum for it
     //TODO: optional - trying to assign int value to enum field

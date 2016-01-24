@@ -324,17 +324,17 @@ public class MapToObjectConverterTest {
 
         assertThat(actual, sameBeanAs(expected));
     }
-    
-    
-    
+
+
+
     private static class ParentClass {
         int a;
     }
-    
+
     private static class ChildClass extends ParentClass {
         int b;
     }
-    
+
     @Test
     public void considersFieldsInSuperClasses() {
         Map<String, Object> map = ImmutableMap.of(
@@ -425,14 +425,14 @@ public class MapToObjectConverterTest {
         mapToObjectConverter.convert(map, ClassWithSyntheticField.Inner.class);
     }
 
-
+    // invalid input ///////////////////////////////////////////////////////////////////////////////////////////////////
 
     private static abstract class AbstractClass {
         int a;
     }
 
     @Test
-    public void throwsExceptionWhenTryingToConvertToAbstractClass() {
+    public void throwsExceptionWhenTargetClassIsAbstract() {
         Map<String, Object> map = singletonMap("a", 3);
 
         expectedException.expect(IllegalArgumentException.class);
@@ -441,7 +441,74 @@ public class MapToObjectConverterTest {
         mapToObjectConverter.convert(map, AbstractClass.class);
     }
 
+    @Test
+    public void throwsExceptionWhenMapIsNull() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("Map cannot be null"));
 
+        mapToObjectConverter.convert(null, SimpleClass.class);
+    }
+
+    @Test
+    public void throwsExceptionWhenTargetClassIsNull() {
+        Map<String, Object> map = singletonMap("a", 3);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("Target class cannot be null"));
+
+        mapToObjectConverter.convert(map, null);
+    }
+
+    @Test
+    public void throwsExceptionWhenTargetClassIsPrimitive() {
+        Map<String, Object> map = singletonMap("a", 3);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("Cannot convert map to primitive type. Use boxed primitive instead"));
+
+        mapToObjectConverter.convert(map, int.class);
+    }
+
+    private enum Enum {
+        X;
+        int a;
+    }
+
+    @Test
+    public void throwsExceptionWhenTargetClassIsEnum() {
+        Map<String, Object> map = singletonMap("a", 3);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("Cannot convert map to enum"));
+
+        mapToObjectConverter.convert(map, Enum.class);
+    }
+
+    private interface Interface {}
+
+    @Test
+    public void throwsExceptionWhenTargetClassIsInterface() {
+        Map<String, Object> map = singletonMap("a", 3);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("Cannot convert map to interface"));
+
+        mapToObjectConverter.convert(map, Interface.class);
+    }
+
+    private @interface Annotation {}
+
+    @Test
+    public void throwsExceptionWhenTargetClassIsAnnotation() {
+        Map<String, Object> map = singletonMap("a", 3);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("Cannot convert map to annotation"));
+
+        mapToObjectConverter.convert(map, Annotation.class);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private static class ClassWithAbstractField {
         Number x;
