@@ -100,6 +100,10 @@ public class MapToObjectConverter {
 
     private static <T> T createInstance(Class<T> aClass) {
         try {
+            if ((aClass.getModifiers() & Modifier.ABSTRACT) != 0) {
+                throw exception("Cannot convert map to abstract class");
+            }
+
             Constructor<Object> objectNoArgConstructor = Object.class.getDeclaredConstructor();
             Constructor<?> constructor = REFLECTION_FACTORY.newConstructorForSerialization(aClass, objectNoArgConstructor);
             return aClass.cast(constructor.newInstance());

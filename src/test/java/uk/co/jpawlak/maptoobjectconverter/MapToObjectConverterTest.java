@@ -456,6 +456,20 @@ public class MapToObjectConverterTest {
         mapToObjectConverter.convert(map, ClassWithSyntheticField.Inner.class);
     }
 
+
+
+    private static abstract class AbstractClass { }
+
+    @Test
+    public void throwsExceptionWhenTryingToConvertToAbstractClass() {
+        Map<String, Object> map = emptyMap();
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Cannot convert map to abstract class");
+
+        mapToObjectConverter.convert(map, AbstractClass.class);
+    }
+
     //TODO: add readme
     //TODO: add licence
     //TODO: support for non-primitive types - configurable (don't allow to set mappers for String, boxed primitives and Optional)
