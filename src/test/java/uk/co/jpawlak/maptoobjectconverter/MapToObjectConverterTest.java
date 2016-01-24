@@ -456,6 +456,8 @@ public class MapToObjectConverterTest {
         mapToObjectConverter.convert(map, ClassWithSyntheticField.Inner.class);
     }
 
+    //TODO: add readme
+    //TODO: add licence
     //TODO: support for non-primitive types - configurable (don't allow to set mappers for String, boxed primitives and Optional)
     //TODO: ignores characters case in fields names (configurable?) - currently case sensitive and untested
 
