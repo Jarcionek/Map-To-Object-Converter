@@ -1,6 +1,5 @@
 package uk.co.jpawlak.maptoobjectconverter;
 
-import com.google.common.collect.ImmutableMap;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -8,14 +7,11 @@ import org.junit.rules.ExpectedException;
 import java.util.Map;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
-import static java.util.Collections.emptyMap;
+import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-/**
- * Basic types are 8 primitive java types (char, boolean, byte, short, int, long, float, double) + registered type mappers
- */
-public class MapToObjectConverterTest_ConvertingToBasicTypes {
+public class MapToObjectConverterTest_ConvertingSingletonMapToSingleValue {
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
@@ -188,35 +184,21 @@ public class MapToObjectConverterTest_ConvertingToBasicTypes {
 
         assertThat(actual, equalTo("hello"));
     }
+    
+    
 
-    @Test
-    public void throwsExceptionForNonSingletonNotEmptyMap() {
-        Map<String, Object> map = ImmutableMap.of("key1", "value1", "key2", "value2");
-
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Cannot convert non-singleton map to single basic value of type 'java.lang.String'. Keys found: 'key1', 'key2'");
-
-        mapToObjectConverter.convert(map, String.class);
+    private static class ArbitraryType {
+        private final String a = "a";
+        private final int one = 1;
     }
 
     @Test
-    public void throwsExceptionForEmptyMap() {
-        Map<String, Object> map = emptyMap();
+    public void convertsSingletonMapWithValueOfArbitraryTypeToSingleValueOfThisType() {
+        Map<String, Object> map = singletonMap("randomTextIgnoredByConverter", new ArbitraryType());
 
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Cannot convert empty map to single basic value of type 'java.lang.String'");
+        ArbitraryType actual = mapToObjectConverter.convert(map, ArbitraryType.class);
 
-        mapToObjectConverter.convert(map, String.class);
-    }
-
-    @Test
-    public void throwsExceptionInCaseOfTypeMismatch() {
-        Map<String, Object> map = singletonMap("x", "hello");
-
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Cannot convert type 'java.lang.String' to basic type 'java.lang.Integer'");
-
-        mapToObjectConverter.convert(map, Integer.class);
+        assertThat(actual, sameBeanAs(new ArbitraryType()));
     }
 
 }

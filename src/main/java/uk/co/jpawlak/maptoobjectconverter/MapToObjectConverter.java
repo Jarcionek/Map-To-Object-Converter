@@ -27,8 +27,8 @@ public class MapToObjectConverter {
             throw exception("Converting to unboxed primitives types is not supported, use boxed primitive type instead");
         }
 
-        if (isBasicType(aClass)) {
-            return singleBasicValue(map, aClass);
+        if (isSingleton(map) && typeMatches(aClass, map)) {
+            return singleValueFrom(map);
         }
 
         checkKeysEqualToFieldsNames(map.keySet(), aClass);
@@ -41,34 +41,21 @@ public class MapToObjectConverter {
         return result;
     }
 
-    private static boolean isBasicType(Class<?> aClass) {
-        return aClass == String.class
-                || aClass == Character.class
-                || aClass == Boolean.class
-                || aClass == Byte.class
-                || aClass == Short.class
-                || aClass == Integer.class
-                || aClass == Long.class
-                || aClass == Float.class
-                || aClass == Double.class;
+    private static boolean isSingleton(Map<?, ?> map) {
+        return map.size() == 1;
     }
 
-    private static <T> T singleBasicValue(Map<String, Object> map, Class<T> aClass) {
-        if (map.isEmpty()) {
-            throw exception("Cannot convert empty map to single basic value of type '%s'", aClass.getName());
-        }
-        if (map.size() != 1) {
-            throw exception("Cannot convert non-singleton map to single basic value of type '%s'. Keys found: '%s'", aClass.getName(), map.keySet().stream().collect(joining("', '")));
-        }
+    private static boolean typeMatches(Class<?> aClass, Map<String, ?> map) {
+        return map.values().stream()
+                .filter(value -> value != null)
+                .findFirst()
+                .map(value -> value.getClass() == aClass)
+                .orElse(false);
+    }
 
-        @SuppressWarnings("unchecked")
-        T result = (T) map.values().stream().findFirst().get();
-
-        if (!aClass.isInstance(result)) {
-            throw exception("Cannot convert type '%s' to basic type '%s'", result.getClass().getName(), aClass.getName());
-        }
-
-        return result;
+    @SuppressWarnings("unchecked")
+    private static <T> T singleValueFrom(Map<String, Object> map) {
+        return (T) map.values().stream().findFirst().get();
     }
 
     private static void checkKeysEqualToFieldsNames(Set<String> keys, Class<?> aClass) {

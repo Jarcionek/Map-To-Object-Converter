@@ -10,7 +10,6 @@ import java.util.Map;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 
@@ -194,6 +193,7 @@ public class MapToObjectConverterTest {
 
 
     public static class ClassWithNotWorkingConstructor {
+        int a;
         public ClassWithNotWorkingConstructor() {
             throw new AssertionError("Unexpected call of the constructor");
         }
@@ -201,7 +201,7 @@ public class MapToObjectConverterTest {
 
     @Test
     public void createsObjectWithoutCallingItsConstructor() {
-        Map<String, Object> map = emptyMap();
+        Map<String, Object> map = singletonMap("a", 7);
 
         mapToObjectConverter.convert(map, ClassWithNotWorkingConstructor.class);
     }
@@ -446,23 +446,28 @@ public class MapToObjectConverterTest {
 
 
     private static class ClassWithSyntheticField {
-        private class Inner {} // this will cause the compiler to create a field in ClassWithSyntheticField.Inner that represents the enclosing class ClassWithSyntheticField
+        // nested class will cause the compiler to create a synthetic field in ClassWithSyntheticField.Inner that represents the enclosing class ClassWithSyntheticField
+        private class Inner {
+            int a;
+        }
     }
 
     @Test
     public void ignoresSyntheticFields() {
-        Map<String, Object> map = emptyMap();
+        Map<String, Object> map = singletonMap("a", 2);
 
         mapToObjectConverter.convert(map, ClassWithSyntheticField.Inner.class);
     }
 
 
 
-    private static abstract class AbstractClass { }
+    private static abstract class AbstractClass {
+        int a;
+    }
 
     @Test
     public void throwsExceptionWhenTryingToConvertToAbstractClass() {
-        Map<String, Object> map = emptyMap();
+        Map<String, Object> map = singletonMap("a", 3);
 
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Cannot convert map to abstract class");
@@ -472,7 +477,6 @@ public class MapToObjectConverterTest {
 
     //TODO: add readme
     //TODO: add licence
-    //TODO: support for non-primitive types - configurable (don't allow to set mappers for String, boxed primitives and Optional)
     //TODO: ignores characters case in fields names (configurable?) - currently case sensitive and untested
 
 }
