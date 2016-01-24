@@ -9,6 +9,7 @@ import java.util.Map;
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.singletonMap;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 public class MapToObjectConverterTest_EnumFields {
 
@@ -39,9 +40,36 @@ public class MapToObjectConverterTest_EnumFields {
         assertThat(actual, sameBeanAs(expected));
     }
 
-    //TODO: null String to enum
-    //TODO: check such string for which there is no enum
-    //TODO: check number -> enum
+    @Test
+    public void throwsExceptionWhenValueIsNull() {
+        Map<String, Object> map = singletonMap("x", null);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("Null values require fields to be Optional. Null values for fields: 'x'"));
+
+        mapToObjectConverter.convert(map, ClassWithEnumField.class);
+    }
+
+    @Test
+    public void throwsExceptionWhenThereIsNoEnumForString() {
+        Map<String, Object> map = singletonMap("x", "blah");
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("'uk.co.jpawlak.maptoobjectconverter.MapToObjectConverterTest_EnumFields$MyEnum' does not have an enum named 'blah'"));
+
+        mapToObjectConverter.convert(map, ClassWithEnumField.class);
+    }
+
+    @Test
+    public void throwsExceptionWhenTryingToConvertNonStringToEnum() {
+        Map<String, Object> map = singletonMap("x", 123);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("Cannot convert value of type 'java.lang.Integer' to enum"));
+
+        mapToObjectConverter.convert(map, ClassWithEnumField.class);
+    }
+
     //TODO: test mapping to enum with fields - make sure that it doesn't set fields on the enum
 
     //TODO: optional - correct enum

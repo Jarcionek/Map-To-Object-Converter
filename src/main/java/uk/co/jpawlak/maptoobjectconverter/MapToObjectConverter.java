@@ -135,7 +135,13 @@ public class MapToObjectConverter {
     private static <E> E asEnum(Class<E> enumClass, Object value) {
         try {
             return (E) enumClass.getDeclaredMethod("valueOf", String.class).invoke(null, value);
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | IllegalArgumentException e) {
+            if (e instanceof InvocationTargetException && e.getCause() instanceof IllegalArgumentException) {
+                throw exception("'%s' does not have an enum named '%s'", enumClass.getName(), value);
+            }
+            if (e instanceof IllegalArgumentException) {
+                throw exception("Cannot convert value of type '%s' to enum", value.getClass().getName());
+            }
             throw new RuntimeException(e);
         }
     }
