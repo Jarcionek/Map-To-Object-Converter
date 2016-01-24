@@ -23,8 +23,13 @@ public class MapToObjectConverter {
     private static final ReflectionFactory REFLECTION_FACTORY = ReflectionFactory.getReflectionFactory();
 
     public <T> T convert(Map<String, Object> map, Class<T> aClass) {
-        if (isSingleton(map) && typeMatches(aClass, map)) {
-            return singleValueFrom(map);
+        if (isSingleton(map)) {
+            if (typeMatches(aClass, map)) {
+                return singleValueFrom(map);
+            }
+            if (aClass.isEnum()) {
+                return asEnum(aClass, map.values().stream().findFirst().get());
+            }
         }
 
         checkKeysEqualToFieldsNames(map.keySet(), aClass);
@@ -112,20 +117,13 @@ public class MapToObjectConverter {
             if (field.getType() == Optional.class) {
                 setOptionalField(result, field, map.get(field.getName()));
             } else {
-                setField(result, field, map.get(field.getName()));
+                if (field.getType().isEnum()) {
+                    setField(result, field, asEnum(field.getType(), map.get(field.getName())));
+                } else {
+                    setField(result, field, map.get(field.getName()));
+                }
             }
         });
-    }
-
-    private static Stream<Field> fieldsOf(Class<?> aClass) {
-        Stream<Field> fields = Stream.empty();
-        while (aClass != Object.class) {
-            fields = Stream.concat(fields, Arrays.stream(aClass.getDeclaredFields()));
-            aClass = aClass.getSuperclass();
-        }
-        return fields
-                .filter(field -> (field.getModifiers() & Modifier.STATIC) == 0)
-                .filter(field -> !field.isSynthetic());
     }
 
     private static void setOptionalField(Object object, Field field, Object value) {
@@ -152,6 +150,26 @@ public class MapToObjectConverter {
         } catch (IllegalArgumentException e) {
             throw exception("Cannot assign value of type '%s' to field '%s' of type '%s'", value.getClass().getName(), field.getName(), field.getType().getName());
         } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static Stream<Field> fieldsOf(Class<?> aClass) {
+        Stream<Field> fields = Stream.empty();
+        while (aClass != Object.class) {
+            fields = Stream.concat(fields, Arrays.stream(aClass.getDeclaredFields()));
+            aClass = aClass.getSuperclass();
+        }
+        return fields
+                .filter(field -> (field.getModifiers() & Modifier.STATIC) == 0)
+                .filter(field -> !field.isSynthetic());
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <E> E asEnum(Class<E> enumClass, Object value) {
+        try {
+            return (E) enumClass.getDeclaredMethod("valueOf", String.class).invoke(null, value);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }

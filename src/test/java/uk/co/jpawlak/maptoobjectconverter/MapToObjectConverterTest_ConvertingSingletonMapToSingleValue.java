@@ -202,4 +202,7 @@ public class MapToObjectConverterTest_ConvertingSingletonMapToSingleValue {
         assertThat(actual, sameBeanAs(new ArbitraryType()));
     }
 
+    //TODO: what happens (and what should?) for singleton map with null value -> Integer.class
+    //TODO: what happens (and what should?) for singleton map with null value -> int.class
+
 }
