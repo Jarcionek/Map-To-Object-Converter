@@ -526,8 +526,4 @@ public class MapToObjectConverterTest {
         assertThat(actual, sameBeanAs(expected));
     }
 
-    //TODO: add readme
-    //TODO: add licence
-    //TODO: ignores characters case in fields names (configurable?) - currently case sensitive and untested
-
 }

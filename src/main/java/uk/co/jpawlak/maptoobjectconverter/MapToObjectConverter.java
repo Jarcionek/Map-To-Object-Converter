@@ -122,6 +122,11 @@ public class MapToObjectConverter {
                 throw exception("Wildcards are not supported. Field '%s' is 'Optional<%s>'", field.getName(), parameterType);
             }
 
+            if (((Class<?>) parameterType).isEnum()) {
+                setField(object, field, Optional.of(asEnum((Class<?>) parameterType, value)));
+                return;
+            }
+
             if (value.getClass() != parameterType) {
                 throw exception("Cannot assign value of type 'Optional<%s>' to field '%s' of type 'Optional<%s>'", value.getClass().getName(), field.getName(), parameterType.getTypeName());
             }

@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
@@ -70,10 +71,54 @@ public class MapToObjectConverterTest_EnumFields {
         mapToObjectConverter.convert(map, ClassWithEnumField.class);
     }
 
-    //TODO: optional - correct enum
-    //TODO: optional - string with no enum for it
-    //TODO: optional - trying to assign int value to enum field
 
-    //TODO: what if someone wants to use other method than valueOf(String)? e.g. find enum by one of its fields?
+
+    private static class ClassWithOptionalEnumField {
+        Optional<MyEnum> x;
+    }
+
+    @Test
+    public void setsOptionalEnumField() {
+        Map<String, Object> map = singletonMap("x", "TWO");
+
+        ClassWithOptionalEnumField actual = mapToObjectConverter.convert(map, ClassWithOptionalEnumField.class);
+
+        ClassWithOptionalEnumField expected = new ClassWithOptionalEnumField();
+        expected.x = Optional.of(MyEnum.TWO);
+
+        assertThat(actual, sameBeanAs(expected));
+    }
+
+    @Test
+    public void setsOptionalEmptyEnumFieldWhenValueIsNull() {
+        Map<String, Object> map = singletonMap("x", null);
+
+        ClassWithOptionalEnumField actual = mapToObjectConverter.convert(map, ClassWithOptionalEnumField.class);
+
+        ClassWithOptionalEnumField expected = new ClassWithOptionalEnumField();
+        expected.x = Optional.empty();
+
+        assertThat(actual, sameBeanAs(expected));
+    }
+
+    @Test
+    public void throwsExceptionWhenThereIsNoEnumForStringAndFieldIsOptional() {
+        Map<String, Object> map = singletonMap("x", "blah");
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("'uk.co.jpawlak.maptoobjectconverter.MapToObjectConverterTest_EnumFields$MyEnum' does not have an enum named 'blah'"));
+
+        mapToObjectConverter.convert(map, ClassWithOptionalEnumField.class);
+    }
+
+    @Test
+    public void throwsExceptionWhenTryingToConvertNonStringToEnumAndFieldIsOptional() {
+        Map<String, Object> map = singletonMap("x", 123);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("Cannot convert value of type 'java.lang.Integer' to enum"));
+
+        mapToObjectConverter.convert(map, ClassWithOptionalEnumField.class);
+    }
 
 }
