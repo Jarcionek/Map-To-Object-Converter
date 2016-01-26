@@ -6,48 +6,44 @@ Example:
 public enum Gender {
     MALE, FEMALE
 }
- 
+
 public class Employee {
- 
-    public final String firstName;
-    public final String surname;
+
+    public final String name;
     public final int age;
     public final Gender gender;
     public final Optional<String> phoneNumber;
- 
-    public Employee(String firstName, String surname, int age, Gender gender, Optional<String> phoneNumber) {
-        this.firstName = firstName;
-        this.surname = surname;
+
+    public Employee(String name, int age, Gender gender, Optional<String> phoneNumber) {
+        this.name = name;
         this.age = age;
         this.gender = gender;
         this.phoneNumber = phoneNumber;
     }
- 
+
 }
- 
+
 public class Example {
- 
+
     @Test
     public void convertsMapToEmployee() {
         Map<String, Object> employeeMap = new HashMap<>();
-        employeeMap.put("firstName", "Jaroslaw");
-        employeeMap.put("surname", "Pawlak");
+        employeeMap.put("name", "Jaroslaw Pawlak");
         employeeMap.put("age", 26);
         employeeMap.put("gender", "MALE");
-        employeeMap.put("phoneNumber", null);
- 
+        employeeMap.put("phoneNumber";, null);
+
         MapToObjectConverter converter = new MapToObjectConverter();
- 
+
         Employee employee = converter.convert(employeeMap, Employee.class);
- 
-        assertEquals("Jaroslaw", employee.firstName);
-        assertEquals("Pawlak", employee.surname);
+
+        assertEquals("Jaroslaw Pawlak", employee.name);
         assertEquals(26, employee.age);
         assertEquals(Gender.MALE, employee.gender);
         assertEquals(Optional.empty(), employee.phoneNumber);
         // multiple assertions give poor diagnostics, use shazamcrest instead
     }
- 
+
 }
 ```
 
