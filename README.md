@@ -31,7 +31,7 @@ public class Example {
         employeeMap.put("name", "Jaroslaw Pawlak");
         employeeMap.put("age", 26);
         employeeMap.put("gender", "MALE");
-        employeeMap.put("phoneNumber";, null);
+        employeeMap.put("phoneNumber", null);
 
         MapToObjectConverter converter = new MapToObjectConverter();
 
