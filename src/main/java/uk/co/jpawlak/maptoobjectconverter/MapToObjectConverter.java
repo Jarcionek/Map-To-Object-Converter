@@ -18,10 +18,66 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toCollection;
 
+/**
+ * @see #convert(Map, Class)
+ */
 public class MapToObjectConverter {
 
     private static final ReflectionFactory REFLECTION_FACTORY = ReflectionFactory.getReflectionFactory();
 
+    /**
+     * Converts Map&lt;String, Object&gt; into an instance of <code>targetClass</code>.
+     * <br/><br/>
+     * Values are mapped to fields using keys and fields' names. Fields can be private final, no methods are required.
+     * The instance will be created without calling a constructor. All non-static fields in created objects are guaranteed
+     * to be non-null.
+     * <br/><br/>
+     * Example usage:
+     *
+     * <pre>
+     * public enum Gender {
+     *     MALE, FEMALE
+     * }
+     *
+     * public class Employee {
+     *
+     *     public final String name;
+     *     public final int age;
+     *     public final Gender gender;
+     *     public final Optional&lt;String&gt; phoneNumber;
+     *
+     *     public Employee(String name, int age, Gender gender, Optional&lt;String&gt; phoneNumber) {
+     *         this.name = name;
+     *         this.age = age;
+     *         this.gender = gender;
+     *         this.phoneNumber = phoneNumber;
+     *     }
+     *
+     * }
+     *
+     * public class Example {
+     *
+     *     public static void main(String... args) {
+     *         Map&lt;String, Object&gt; employeeMap = new HashMap&lt;&gt;();
+     *         employeeMap.put("name", "Jaroslaw Pawlak");
+     *         employeeMap.put("age", 26);
+     *         employeeMap.put("gender", "MALE");
+     *         employeeMap.put("phoneNumber", null);
+     *
+     *         MapToObjectConverter converter = new MapToObjectConverter();
+     *
+     *         Employee employee = converter.convert(employeeMap, Employee.class);
+     *     }
+     * }
+     * </pre>
+     *
+     * @param map map to convert into object
+     * @param targetClass a class whose instance will be created
+     * @param <T> the type of <code>targetClass</code>
+     * @return as instance of <code>targetClass</code>
+     * @throws IllegalArgumentException if converting fails due to invalid usage or a mismatch between number/name of properties in the map and target class
+     * @throws RuntimeException if converting fails for any other reason which was not considered before - if you get this, please report at https://github.com/Jarcionek/Map-To-Object-Converter
+     */
     public <T> T convert(Map<String, Object> map, Class<T> targetClass) {
         checkParameters(map, targetClass);
         checkKeysEqualToFieldsNames(map.keySet(), targetClass);
