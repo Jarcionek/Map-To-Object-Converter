@@ -27,11 +27,11 @@ public class MapToObjectConverter {
 
     /**
      * Converts Map&lt;String, Object&gt; into an instance of <code>targetClass</code>.
-     * <br/><br/>
+     * <br><br>
      * Values are mapped to fields using keys and fields' names. Fields can be private final, no methods are required.
      * The instance will be created without calling a constructor. All non-static fields in created objects are guaranteed
      * to be non-null.
-     * <br/><br/>
+     * <br><br>
      * Example usage:
      *
      * <pre>
