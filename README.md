@@ -69,6 +69,6 @@ Just add a Maven dependency to your pom file:
 <dependency>
     <groupId>uk.co.jpawlak</groupId>
     <artifactId>map-to-object-converter</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ```
