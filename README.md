@@ -1,7 +1,7 @@
 # Map-To-Object-Converter
 A tool that allows to easily convert `Map<String, Object>` returned by jdbi (but not only) into staticly typed classes.
 
-Example:
+### Example
 ```java
 public enum Gender {
     MALE, FEMALE
@@ -47,7 +47,7 @@ public class Example {
 }
 ```
 
-Features:
+### Features
 * assigns the values from the map to fields whose names are equal to the keys
 * throws exception if there are entries without corresponding fields (of course listing the keys)
 * throws exception if there are fields for which there were no values (of course listing names of all such fields)
@@ -60,3 +60,15 @@ Features:
 * allows the fields to be supertypes of values, so you can assign `Integer` value to `Number` field
 * unfortunately, it doesn’t allow wildcards in `Optionals`, so `Integer` value can be assigned to `Optional<Integer>` field but cannot be assigned to field declared as `Optional<? extends Number>` (this might be improved in future)
 * doesn’t allow raw Optionals
+
+### Quick start
+
+Just add a Maven dependency to your pom file:
+
+```
+<dependency>
+    <groupId>uk.co.jpawlak</groupId>
+    <artifactId>map-to-object-converter</artifactId>
+    <version>1.0</version>
+</dependency>
+```
