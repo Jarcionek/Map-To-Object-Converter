@@ -25,6 +25,9 @@ public class MapToObjectConverter {
 
     private static final ReflectionFactory REFLECTION_FACTORY = ReflectionFactory.getReflectionFactory();
 
+    private Class<?> classForConverter;
+    private SingleValueConverter<?> converter;
+
     /**
      * Converts Map&lt;String, Object&gt; into an instance of <code>targetClass</code>.
      * <br><br>
@@ -90,6 +93,12 @@ public class MapToObjectConverter {
         return result;
     }
 
+    public <T> MapToObjectConverter registerConverter(Class<T> aClass, SingleValueConverter<T> singleValueConverter) {
+        classForConverter = aClass;
+        converter = singleValueConverter;
+        return null;
+    }
+
     private static void checkParameters(Map<?, ?> map, Class<?> targetClass) {
         if (map == null) {
             throw exception("Map cannot be null");
@@ -151,12 +160,14 @@ public class MapToObjectConverter {
         }
     }
 
-    private static <T> void setFields(Map<String, Object> map, Class<T> targetClass, T result) {
+    private <T> void setFields(Map<String, Object> map, Class<T> targetClass, T result) {
         fieldsOf(targetClass).forEach(field -> {
             if (field.getType() == Optional.class) {
                 setOptionalField(result, field, map.get(field.getName()));
             } else {
-                if (field.getType().isEnum()) {
+                if (field.getType() == classForConverter) {
+                    setField(result, field, converter.convert(map.get(field.getName())));
+                } else if (field.getType().isEnum()) {
                     setField(result, field, asEnum(field.getType(), map.get(field.getName())));
                 } else {
                     setField(result, field, map.get(field.getName()));
