@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -25,8 +26,7 @@ public class MapToObjectConverter {
 
     private static final ReflectionFactory REFLECTION_FACTORY = ReflectionFactory.getReflectionFactory();
 
-    private Class<?> classForConverter;
-    private SingleValueConverter<?> converter;
+    private final Map<Class<?>, SingleValueConverter<?>> converters = new HashMap<>();
 
     /**
      * Converts Map&lt;String, Object&gt; into an instance of <code>targetClass</code>.
@@ -94,9 +94,8 @@ public class MapToObjectConverter {
     }
 
     public <T> MapToObjectConverter registerConverter(Class<T> aClass, SingleValueConverter<T> singleValueConverter) {
-        classForConverter = aClass;
-        converter = singleValueConverter;
-        return null;
+        converters.put(aClass, singleValueConverter);
+        return this;
     }
 
     private static void checkParameters(Map<?, ?> map, Class<?> targetClass) {
@@ -165,8 +164,8 @@ public class MapToObjectConverter {
             if (field.getType() == Optional.class) {
                 setOptionalField(result, field, map.get(field.getName()));
             } else {
-                if (field.getType() == classForConverter) {
-                    setField(result, field, converter.convert(map.get(field.getName())));
+                if (converters.containsKey(field.getType())) {
+                    setField(result, field, converters.get(field.getType()).convert(map.get(field.getName())));
                 } else if (field.getType().isEnum()) {
                     setField(result, field, asEnum(field.getType(), map.get(field.getName())));
                 } else {
