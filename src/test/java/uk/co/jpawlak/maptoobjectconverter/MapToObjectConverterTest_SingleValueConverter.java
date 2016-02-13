@@ -5,6 +5,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -126,6 +127,24 @@ public class MapToObjectConverterTest_SingleValueConverter {
         expectedException.expectCause(instanceOf(NullPointerException.class));
 
         mapToObjectConverter.convert(map, SimpleClass.class);
+    }
+
+    @Test
+    public void usesRegisteredConverterEvenWhenOriginalValueIsNull() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("string", null);
+        map.put("number", 0);
+
+        mapToObjectConverter
+                .registerConverter(String.class, value -> "non null");
+
+        SimpleClass actual = mapToObjectConverter.convert(map, SimpleClass.class);
+
+        SimpleClass expected = new SimpleClass();
+        expected.string = "non null";
+        expected.number = 0;
+
+        assertThat(actual, sameBeanAs(expected));
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
