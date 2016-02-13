@@ -133,7 +133,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
     }
 
     @Test
-    public void setsOptionalEmptyWhenRegistedConverterReturnsNull() {
+    public void setsOptionalEmptyWhenRegisteredConverterReturnsNull() {
         Map<String, Object> map = singletonMap("optionalNumber", 35);
 
         mapToObjectConverter.registerConverter(Integer.class, value -> null);
