@@ -9,8 +9,14 @@ class Converters {
     private final Map<Class<?>, SingleValueConverter<?>> converters = new HashMap<>();
 
     <T> void registerConverter(Class<T> aClass, SingleValueConverter<T> singleValueConverter) {
+        if (aClass == null) {
+            throw new IllegalArgumentException("Cannot register converter for null class.");
+        }
         if (aClass == Optional.class) {
-            throw new IllegalArgumentException(String.format("Cannot register convert for '%s'. Register converter for the type parameter instead.", Optional.class.getName()));
+            throw new IllegalArgumentException("Cannot register convert for 'java.util.Optional'. Register converter for the type parameter instead.");
+        }
+        if (singleValueConverter == null) {
+            throw new IllegalArgumentException("Registered converter cannot be null.");
         }
         converters.put(aClass, singleValueConverter);
     }

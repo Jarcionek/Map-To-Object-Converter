@@ -31,6 +31,22 @@ public class MapToObjectConverterTest_SingleValueConverter {
         mapToObjectConverter.registerConverter(Optional.class, value -> null);
     }
 
+    @Test
+    public void throwsExceptionWhenTryingToRegisterNullConverter() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("Registered converter cannot be null."));
+
+        mapToObjectConverter.registerConverter(String.class, null);
+    }
+
+    @Test
+    public void throwsExceptionWhenTryingToRegisterConverterForNullType() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("Cannot register converter for null class."));
+
+        mapToObjectConverter.registerConverter(null, v -> v);
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public static class SimpleClass {
