@@ -211,7 +211,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
         mapToObjectConverter.registerConverter(Integer.class, (SingleValueConverter) value -> "a string");
 
         expectedException.expect(RegisteredConverterException.class);
-        expectedException.expectMessage(equalTo("Cannot assign value of type 'Optional<java.lang.String>' returned by registered converter to field 'optionalNumber' of type 'Optional<java.lang.Integer>'"));
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'Optional<java.lang.String>' returned by registered converter to field 'optionalNumber' of type 'Optional<java.lang.Integer>'."));
 
         mapToObjectConverter.convert(map, ClassWithOptionalField.class);
     }
@@ -320,7 +320,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
         Map<String, Object> map = singletonMap("numbers", "1,2,3");
 
         expectedException.expect(ConverterTypeMismatchException.class);
-        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.String' to field 'numbers' of type 'int[]'"));
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.String' to field 'numbers' of type 'int[]'."));
 
         mapToObjectConverter.convert(map, ClassWithPrimitiveArray.class);
     }
@@ -330,7 +330,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
         Map<String, Object> map = singletonMap("numbers", new int[] {1, 2, 3});
 
         expectedException.expect(ConverterTypeMismatchException.class);
-        expectedException.expectMessage(equalTo("Cannot assign value of type 'int[]' to field 'numbers' of type 'java.lang.Integer[]'"));
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'int[]' to field 'numbers' of type 'java.lang.Integer[]'."));
 
         mapToObjectConverter.convert(map, ClassWithIntegerArray.class);
     }
@@ -352,7 +352,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
         Map<String, Object> map = singletonMap("numbers", new Integer[] {1, 2, 3});
 
         expectedException.expect(ConverterTypeMismatchException.class);
-        expectedException.expectMessage(equalTo("Cannot assign value of type 'Optional<java.lang.Integer[]>' to field 'numbers' of type 'Optional<int[]>'"));
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'Optional<java.lang.Integer[]>' to field 'numbers' of type 'Optional<int[]>'."));
 
         mapToObjectConverter.convert(map, ClassWithOptionalPrimitiveArray.class);
     }
@@ -364,7 +364,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
         mapToObjectConverter.registerConverter(int[].class, (SingleValueConverter) value -> new Integer[][] {{5}});
 
         expectedException.expect(RegisteredConverterException.class);
-        expectedException.expectMessage(equalTo("Cannot assign value of type 'Optional<java.lang.Integer[][]>' returned by registered converter to field 'numbers' of type 'Optional<int[]>'"));
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'Optional<java.lang.Integer[][]>' returned by registered converter to field 'numbers' of type 'Optional<int[]>'."));
 
         mapToObjectConverter.convert(map, ClassWithOptionalPrimitiveArray.class);
     }
@@ -404,7 +404,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
                 .registerConverter(List.class, value -> asList(3, 6, 9));
 
         expectedException.expect(ConverterNullValueException.class);
-        expectedException.expectMessage(equalTo("Null values require fields to be Optional. Null values for fields: 'list'"));
+        expectedException.expectMessage(equalTo("Null values require fields to be Optional. Null values for fields: 'list'."));
 
         mapToObjectConverter.convert(map, ClassWithListOfUnknownType.class);
     }

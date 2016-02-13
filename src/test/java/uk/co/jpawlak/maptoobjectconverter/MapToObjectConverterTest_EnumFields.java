@@ -49,7 +49,7 @@ public class MapToObjectConverterTest_EnumFields {
         Map<String, Object> map = singletonMap("x", null);
 
         expectedException.expect(ConverterNullValueException.class);
-        expectedException.expectMessage(equalTo("Null values require fields to be Optional. Null values for fields: 'x'"));
+        expectedException.expectMessage(equalTo("Null values require fields to be Optional. Null values for fields: 'x'."));
 
         mapToObjectConverter.convert(map, ClassWithEnumField.class);
     }
@@ -59,7 +59,7 @@ public class MapToObjectConverterTest_EnumFields {
         Map<String, Object> map = singletonMap("x", "blah");
 
         expectedException.expect(ConverterEnumCreationException.class);
-        expectedException.expectMessage(equalTo("'uk.co.jpawlak.maptoobjectconverter.MapToObjectConverterTest_EnumFields$MyEnum' does not have an enum named 'blah'"));
+        expectedException.expectMessage(equalTo("'uk.co.jpawlak.maptoobjectconverter.MapToObjectConverterTest_EnumFields$MyEnum' does not have an enum named 'blah'."));
 
         mapToObjectConverter.convert(map, ClassWithEnumField.class);
     }
@@ -69,7 +69,7 @@ public class MapToObjectConverterTest_EnumFields {
         Map<String, Object> map = singletonMap("x", 123);
 
         expectedException.expect(ConverterEnumCreationException.class);
-        expectedException.expectMessage(equalTo("Cannot convert value of type 'java.lang.Integer' to enum"));
+        expectedException.expectMessage(equalTo("Cannot convert value of type 'java.lang.Integer' to enum."));
 
         mapToObjectConverter.convert(map, ClassWithEnumField.class);
     }
@@ -109,7 +109,7 @@ public class MapToObjectConverterTest_EnumFields {
         Map<String, Object> map = singletonMap("x", "blah");
 
         expectedException.expect(ConverterEnumCreationException.class);
-        expectedException.expectMessage(equalTo("'uk.co.jpawlak.maptoobjectconverter.MapToObjectConverterTest_EnumFields$MyEnum' does not have an enum named 'blah'"));
+        expectedException.expectMessage(equalTo("'uk.co.jpawlak.maptoobjectconverter.MapToObjectConverterTest_EnumFields$MyEnum' does not have an enum named 'blah'."));
 
         mapToObjectConverter.convert(map, ClassWithOptionalEnumField.class);
     }
@@ -119,7 +119,7 @@ public class MapToObjectConverterTest_EnumFields {
         Map<String, Object> map = singletonMap("x", 123);
 
         expectedException.expect(ConverterEnumCreationException.class);
-        expectedException.expectMessage(equalTo("Cannot convert value of type 'java.lang.Integer' to enum"));
+        expectedException.expectMessage(equalTo("Cannot convert value of type 'java.lang.Integer' to enum."));
 
         mapToObjectConverter.convert(map, ClassWithOptionalEnumField.class);
     }

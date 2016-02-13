@@ -36,13 +36,13 @@ class Converters {
 
     SingleValueConverter<?> getConverterFor(Type type, String fieldName) {
         if (type == Optional.class) {
-            throw new ConverterIllegalArgumentException("Raw types are not supported. Field '%s' is 'Optional'", fieldName);
+            throw new ConverterIllegalArgumentException("Raw types are not supported. Field '%s' is 'Optional'.", fieldName);
         }
 
         if (type instanceof ParameterizedTypeImpl && ((ParameterizedTypeImpl) type).getRawType() == Optional.class) {
             Type parameterType = ((ParameterizedTypeImpl) type).getActualTypeArguments()[0];
             if (!(parameterType instanceof Class<?>)) {
-                throw new ConverterIllegalArgumentException("Wildcards are not supported. Field '%s' is 'Optional<%s>'", fieldName, parameterType);
+                throw new ConverterIllegalArgumentException("Wildcards are not supported. Field '%s' is 'Optional<%s>'.", fieldName, parameterType);
             }
             return optionalValueConverter(type, fieldName);
         }
@@ -67,9 +67,9 @@ class Converters {
 
             if (convertedValue != null && convertedValue.getClass() != parameterType) {
                 if (this.hasConverterFor(parameterType)) {
-                    throw new RegisteredConverterException("Cannot assign value of type 'Optional<%s>' returned by registered converter to field '%s' of type 'Optional<%s>'", convertedValue.getClass().getTypeName(), fieldName, parameterType.getTypeName());
+                    throw new RegisteredConverterException("Cannot assign value of type 'Optional<%s>' returned by registered converter to field '%s' of type 'Optional<%s>'.", convertedValue.getClass().getTypeName(), fieldName, parameterType.getTypeName());
                 } else {
-                    throw new ConverterTypeMismatchException("Cannot assign value of type 'Optional<%s>' to field '%s' of type 'Optional<%s>'", value.getClass().getTypeName(), fieldName, parameterType.getTypeName());
+                    throw new ConverterTypeMismatchException("Cannot assign value of type 'Optional<%s>' to field '%s' of type 'Optional<%s>'.", value.getClass().getTypeName(), fieldName, parameterType.getTypeName());
                 }
             }
             return Optional.ofNullable(convertedValue);
@@ -85,10 +85,10 @@ class Converters {
             return (E) enumClass.getDeclaredMethod("valueOf", String.class).invoke(null, value);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | IllegalArgumentException e) {
             if (e instanceof InvocationTargetException && e.getCause() instanceof IllegalArgumentException) {
-                throw new ConverterEnumCreationException("'%s' does not have an enum named '%s'", enumClass.getTypeName(), value);
+                throw new ConverterEnumCreationException("'%s' does not have an enum named '%s'.", enumClass.getTypeName(), value);
             }
             if (e instanceof IllegalArgumentException) {
-                throw new ConverterEnumCreationException("Cannot convert value of type '%s' to enum", value.getClass().getTypeName());
+                throw new ConverterEnumCreationException("Cannot convert value of type '%s' to enum.", value.getClass().getTypeName());
             }
             throw new ConverterUnknownException(e);
         }

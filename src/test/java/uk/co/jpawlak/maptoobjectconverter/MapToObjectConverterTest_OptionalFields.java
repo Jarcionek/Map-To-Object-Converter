@@ -90,7 +90,7 @@ public class MapToObjectConverterTest_OptionalFields {
         Map<String, Object> map = singletonMap("optionalAddress", 123);
 
         expectedException.expect(ConverterTypeMismatchException.class);
-        expectedException.expectMessage(equalTo("Cannot assign value of type 'Optional<java.lang.Integer>' to field 'optionalAddress' of type 'Optional<java.lang.String>'"));
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'Optional<java.lang.Integer>' to field 'optionalAddress' of type 'Optional<java.lang.String>'."));
 
         mapToObjectConverter.convert(map, ClassWithOptionalField.class);
     }
@@ -106,7 +106,7 @@ public class MapToObjectConverterTest_OptionalFields {
         Map<String, Object> map = singletonMap("x", "abc");
 
         expectedException.expect(ConverterIllegalArgumentException.class);
-        expectedException.expectMessage(equalTo("Wildcards are not supported. Field 'x' is 'Optional<?>'"));
+        expectedException.expectMessage(equalTo("Wildcards are not supported. Field 'x' is 'Optional<?>'."));
 
         mapToObjectConverter.convert(map, ClassWithOptionalWildcardField.class);
     }
@@ -122,7 +122,7 @@ public class MapToObjectConverterTest_OptionalFields {
         Map<String, Object> map = singletonMap("x", "abc");
 
         expectedException.expect(ConverterIllegalArgumentException.class);
-        expectedException.expectMessage(equalTo("Wildcards are not supported. Field 'x' is 'Optional<T>'"));
+        expectedException.expectMessage(equalTo("Wildcards are not supported. Field 'x' is 'Optional<T>'."));
 
         mapToObjectConverter.convert(map, ClassWithOptionalBoundedWildcardField.class);
     }
@@ -138,7 +138,7 @@ public class MapToObjectConverterTest_OptionalFields {
         Map<String, Object> map = singletonMap("z", "abc");
 
         expectedException.expect(ConverterIllegalArgumentException.class);
-        expectedException.expectMessage("Raw types are not supported. Field 'z' is 'Optional'");
+        expectedException.expectMessage("Raw types are not supported. Field 'z' is 'Optional'.");
 
         mapToObjectConverter.convert(map, ClassWithRawOptional.class);
     }

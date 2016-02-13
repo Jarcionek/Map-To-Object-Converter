@@ -110,25 +110,25 @@ public class MapToObjectConverter {
 
     private static void checkParameters(Map<?, ?> map, Class<?> targetClass) {
         if (map == null) {
-            throw new ConverterIllegalArgumentException("Map cannot be null");
+            throw new ConverterIllegalArgumentException("Map cannot be null.");
         }
         if (targetClass == null) {
-            throw new ConverterIllegalArgumentException("Target class cannot be null");
+            throw new ConverterIllegalArgumentException("Target class cannot be null.");
         }
         if (targetClass.isPrimitive()) {
-            throw new ConverterIllegalArgumentException("Cannot convert map to primitive type. Use boxed primitive instead");
+            throw new ConverterIllegalArgumentException("Cannot convert map to primitive type.");
         }
         if (targetClass.isEnum()) {
-            throw new ConverterIllegalArgumentException("Cannot convert map to enum");
+            throw new ConverterIllegalArgumentException("Cannot convert map to enum.");
         }
         if (targetClass.isAnnotation()) {
-            throw new ConverterIllegalArgumentException("Cannot convert map to annotation");
+            throw new ConverterIllegalArgumentException("Cannot convert map to annotation.");
         }
         if (targetClass.isInterface()) {
-            throw new ConverterIllegalArgumentException("Cannot convert map to interface");
+            throw new ConverterIllegalArgumentException("Cannot convert map to interface.");
         }
         if ((targetClass.getModifiers() & Modifier.ABSTRACT) != 0) {
-            throw new ConverterIllegalArgumentException("Cannot convert map to abstract class");
+            throw new ConverterIllegalArgumentException("Cannot convert map to abstract class.");
         }
     }
 
@@ -139,12 +139,12 @@ public class MapToObjectConverter {
 
         Set<String> missingFields = keys.stream().filter(key -> !fieldsNames.contains(key)).collect(toCollection(LinkedHashSet::new));
         if (!missingFields.isEmpty()) {
-            throw new ConverterMissingFieldsException("No fields for keys: '%s'", missingFields.stream().collect(joining("', '")));
+            throw new ConverterMissingFieldsException("No fields for keys: '%s'.", missingFields.stream().collect(joining("', '")));
         }
 
         Set<String> missingValues = fieldsNames.stream().filter(fieldName -> !keys.contains(fieldName)).collect(toCollection(LinkedHashSet::new));
         if (!missingValues.isEmpty()) {
-            throw new ConverterMissingValuesException("No values for fields: '%s'", missingValues.stream().collect(joining("', '")));
+            throw new ConverterMissingValuesException("No values for fields: '%s'.", missingValues.stream().collect(joining("', '")));
         }
     }
 
@@ -156,7 +156,7 @@ public class MapToObjectConverter {
                 .collect(toCollection(LinkedHashSet::new));
 
         if (!fieldsNames.isEmpty()) {
-            throw new ConverterNullValueException("Null values require fields to be Optional. Null values for fields: '%s'", fieldsNames.stream().collect(joining("', '")));
+            throw new ConverterNullValueException("Null values require fields to be Optional. Null values for fields: '%s'.", fieldsNames.stream().collect(joining("', '")));
         }
     }
 
@@ -187,7 +187,7 @@ public class MapToObjectConverter {
             field.setAccessible(true);
             field.set(object, value);
         } catch (IllegalArgumentException e) {
-            throw new ConverterTypeMismatchException("Cannot assign value of type '%s' to field '%s' of type '%s'", value.getClass().getTypeName(), field.getName(), field.getType().getTypeName());
+            throw new ConverterTypeMismatchException("Cannot assign value of type '%s' to field '%s' of type '%s'.", value.getClass().getTypeName(), field.getName(), field.getType().getTypeName());
         } catch (IllegalAccessException e) {
             throw new ConverterUnknownException(e);
         }

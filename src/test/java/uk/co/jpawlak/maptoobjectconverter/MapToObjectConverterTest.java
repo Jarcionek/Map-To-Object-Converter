@@ -47,7 +47,7 @@ public class MapToObjectConverterTest {
         Map<String, Object> map = singletonMap("propertyName", 3);
 
         expectedException.expect(ConverterTypeMismatchException.class);
-        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Integer' to field 'propertyName' of type 'java.lang.String'"));
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Integer' to field 'propertyName' of type 'java.lang.String'."));
 
         mapToObjectConverter.convert(map, SimpleClass.class);
     }
@@ -67,7 +67,7 @@ public class MapToObjectConverterTest {
         Map<String, Object> map = singletonMap("trueOrFalse", 'x');
 
         expectedException.expect(ConverterTypeMismatchException.class);
-        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Character' to field 'trueOrFalse' of type 'boolean'"));
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Character' to field 'trueOrFalse' of type 'boolean'."));
 
         mapToObjectConverter.convert(map, SimpleClassWithPrimitiveBooleanField.class);
     }
@@ -77,7 +77,7 @@ public class MapToObjectConverterTest {
         Map<String, Object> map = singletonMap("number", true);
 
         expectedException.expect(ConverterTypeMismatchException.class);
-        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Boolean' to field 'number' of type 'int'"));
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Boolean' to field 'number' of type 'int'."));
 
         mapToObjectConverter.convert(map, SimpleClassWithPrimitiveField.class);
     }
@@ -87,7 +87,7 @@ public class MapToObjectConverterTest {
         Map<String, Object> map = singletonMap("trueOrFalse", (byte) 1);
 
         expectedException.expect(ConverterTypeMismatchException.class);
-        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Byte' to field 'trueOrFalse' of type 'boolean'"));
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Byte' to field 'trueOrFalse' of type 'boolean'."));
 
         mapToObjectConverter.convert(map, SimpleClassWithPrimitiveBooleanField.class);
     }
@@ -97,7 +97,7 @@ public class MapToObjectConverterTest {
         Map<String, Object> map = singletonMap("trueOrFalse", (short) 2);
 
         expectedException.expect(ConverterTypeMismatchException.class);
-        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Short' to field 'trueOrFalse' of type 'boolean'"));
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Short' to field 'trueOrFalse' of type 'boolean'."));
 
         mapToObjectConverter.convert(map, SimpleClassWithPrimitiveBooleanField.class);
     }
@@ -107,7 +107,7 @@ public class MapToObjectConverterTest {
         Map<String, Object> map = singletonMap("trueOrFalse", 3);
 
         expectedException.expect(ConverterTypeMismatchException.class);
-        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Integer' to field 'trueOrFalse' of type 'boolean'"));
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Integer' to field 'trueOrFalse' of type 'boolean'."));
 
         mapToObjectConverter.convert(map, SimpleClassWithPrimitiveBooleanField.class);
     }
@@ -117,7 +117,7 @@ public class MapToObjectConverterTest {
         Map<String, Object> map = singletonMap("number", 4L);
 
         expectedException.expect(ConverterTypeMismatchException.class);
-        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Long' to field 'number' of type 'int'"));
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Long' to field 'number' of type 'int'."));
 
         mapToObjectConverter.convert(map, SimpleClassWithPrimitiveField.class);
     }
@@ -127,7 +127,7 @@ public class MapToObjectConverterTest {
         Map<String, Object> map = singletonMap("number", 0.5f);
 
         expectedException.expect(ConverterTypeMismatchException.class);
-        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Float' to field 'number' of type 'int'"));
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Float' to field 'number' of type 'int'."));
 
         mapToObjectConverter.convert(map, SimpleClassWithPrimitiveField.class);
     }
@@ -137,7 +137,7 @@ public class MapToObjectConverterTest {
         Map<String, Object> map = singletonMap("number", 0.25d);
 
         expectedException.expect(ConverterTypeMismatchException.class);
-        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Double' to field 'number' of type 'int'"));
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Double' to field 'number' of type 'int'."));
 
         mapToObjectConverter.convert(map, SimpleClassWithPrimitiveField.class);
     }
@@ -179,7 +179,7 @@ public class MapToObjectConverterTest {
         );
 
         expectedException.expect(ConverterMissingFieldsException.class);
-        expectedException.expectMessage(equalTo("No fields for keys: 'four', 'five'"));
+        expectedException.expectMessage(equalTo("No fields for keys: 'four', 'five'."));
 
         mapToObjectConverter.convert(map, ClassWithMultipleFields.class);
     }
@@ -189,7 +189,7 @@ public class MapToObjectConverterTest {
         Map<String, Object> map = singletonMap("one", "1");
 
         expectedException.expect(ConverterMissingValuesException.class);
-        expectedException.expectMessage(equalTo("No values for fields: 'two', 'three'"));
+        expectedException.expectMessage(equalTo("No values for fields: 'two', 'three'."));
 
         mapToObjectConverter.convert(map, ClassWithMultipleFields.class);
     }
@@ -390,7 +390,7 @@ public class MapToObjectConverterTest {
         );
 
         expectedException.expect(ConverterTypeMismatchException.class);
-        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Integer' to field 'a' of type 'java.lang.String'"));
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.Integer' to field 'a' of type 'java.lang.String'."));
 
         mapToObjectConverter.convert(map, ChildClassWithDuplicatedFieldButOfDifferentType.class);
     }
@@ -441,7 +441,7 @@ public class MapToObjectConverterTest {
         Map<String, Object> map = singletonMap("a", 3);
 
         expectedException.expect(ConverterIllegalArgumentException.class);
-        expectedException.expectMessage(equalTo("Cannot convert map to abstract class"));
+        expectedException.expectMessage(equalTo("Cannot convert map to abstract class."));
 
         mapToObjectConverter.convert(map, AbstractClass.class);
     }
@@ -449,7 +449,7 @@ public class MapToObjectConverterTest {
     @Test
     public void throwsExceptionWhenMapIsNull() {
         expectedException.expect(ConverterIllegalArgumentException.class);
-        expectedException.expectMessage(equalTo("Map cannot be null"));
+        expectedException.expectMessage(equalTo("Map cannot be null."));
 
         mapToObjectConverter.convert(null, SimpleClass.class);
     }
@@ -459,7 +459,7 @@ public class MapToObjectConverterTest {
         Map<String, Object> map = singletonMap("a", 3);
 
         expectedException.expect(ConverterIllegalArgumentException.class);
-        expectedException.expectMessage(equalTo("Target class cannot be null"));
+        expectedException.expectMessage(equalTo("Target class cannot be null."));
 
         mapToObjectConverter.convert(map, null);
     }
@@ -469,7 +469,7 @@ public class MapToObjectConverterTest {
         Map<String, Object> map = singletonMap("a", 3);
 
         expectedException.expect(ConverterIllegalArgumentException.class);
-        expectedException.expectMessage(equalTo("Cannot convert map to primitive type. Use boxed primitive instead"));
+        expectedException.expectMessage(equalTo("Cannot convert map to primitive type."));
 
         mapToObjectConverter.convert(map, int.class);
     }
@@ -484,7 +484,7 @@ public class MapToObjectConverterTest {
         Map<String, Object> map = singletonMap("a", 3);
 
         expectedException.expect(ConverterIllegalArgumentException.class);
-        expectedException.expectMessage(equalTo("Cannot convert map to enum"));
+        expectedException.expectMessage(equalTo("Cannot convert map to enum."));
 
         mapToObjectConverter.convert(map, Enum.class);
     }
@@ -496,7 +496,7 @@ public class MapToObjectConverterTest {
         Map<String, Object> map = singletonMap("a", 3);
 
         expectedException.expect(ConverterIllegalArgumentException.class);
-        expectedException.expectMessage(equalTo("Cannot convert map to interface"));
+        expectedException.expectMessage(equalTo("Cannot convert map to interface."));
 
         mapToObjectConverter.convert(map, Interface.class);
     }
@@ -508,7 +508,7 @@ public class MapToObjectConverterTest {
         Map<String, Object> map = singletonMap("a", 3);
 
         expectedException.expect(ConverterIllegalArgumentException.class);
-        expectedException.expectMessage(equalTo("Cannot convert map to annotation"));
+        expectedException.expectMessage(equalTo("Cannot convert map to annotation."));
 
         mapToObjectConverter.convert(map, Annotation.class);
     }
