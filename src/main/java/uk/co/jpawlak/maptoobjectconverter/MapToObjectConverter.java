@@ -164,17 +164,13 @@ public class MapToObjectConverter {
             if (field.getType() == Optional.class) {
                 setOptionalField(result, field, map.get(field.getName()));
             } else {
-                if (converters.hasConverterFor(field.getType())) {
-                    Object value = converters.convert(map.get(field.getName()), field.getType());
-                    if (value == null) {
-                        throw new RegisteredConverterException(String.format("Null values require fields to be Optional. Registered Converter for type '%s' returned null.", field.getType().getName()));
-                    }
-                    setField(result, field, value);
-                } else if (field.getType().isEnum()) {
-                    setField(result, field, asEnum(field.getType(), map.get(field.getName())));
-                } else {
-                    setField(result, field, map.get(field.getName()));
+                SingleValueConverter<?> converter = converters.getConverterFor(field.getType());
+                Object value = map.get(field.getName());
+                Object convertedValue = converter.convert(value);
+                if (convertedValue == null) {
+                    throw new RegisteredConverterException(String.format("Null values require fields to be Optional. Registered Converter for type '%s' returned null.", field.getType().getName()));
                 }
+                setField(result, field, convertedValue);
             }
         });
     }
@@ -190,7 +186,8 @@ public class MapToObjectConverter {
         }
 
         if (converters.hasConverterFor((Class<?>) parameterType)) {
-            Object convertedValue = converters.convert(value, (Class<?>) parameterType);
+            SingleValueConverter<?> converter = converters.getConverterFor((Class<?>) parameterType);
+            Object convertedValue = converter.convert(value);
             if (convertedValue != null && convertedValue.getClass() != parameterType) {
                 throw new RegisteredConverterException(String.format("Cannot assign value of type 'Optional<%s>' returned by registered converter to field '%s' of type 'Optional<%s>'", convertedValue.getClass().getName(), field.getName(), parameterType.getTypeName()));
             }
