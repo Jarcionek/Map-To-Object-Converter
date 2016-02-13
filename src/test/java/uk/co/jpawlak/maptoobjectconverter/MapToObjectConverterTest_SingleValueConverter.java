@@ -6,9 +6,11 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
+import static java.util.Collections.singletonMap;
 
 public class MapToObjectConverterTest_SingleValueConverter {
 
@@ -58,6 +60,40 @@ public class MapToObjectConverterTest_SingleValueConverter {
         SimpleClass expected = new SimpleClass();
         expected.string = "converted value 2";
         expected.number = 4;
+
+        assertThat(actual, sameBeanAs(expected));
+    }
+
+
+
+    public static class ClassWithOptionalField {
+        Optional<Integer> optionalNumber;
+    }
+
+    @Test
+    public void usesRegisteredConverterForOptionalField() {
+        Map<String, Object> map = singletonMap("optionalNumber", 15);
+
+        mapToObjectConverter.registerConverter(Integer.class, value -> (int) value * 2);
+
+        ClassWithOptionalField actual = mapToObjectConverter.convert(map, ClassWithOptionalField.class);
+
+        ClassWithOptionalField expected = new ClassWithOptionalField();
+        expected.optionalNumber = Optional.of(30);
+
+        assertThat(actual, sameBeanAs(expected));
+    }
+
+    @Test
+    public void setsOptionalEmptyWhenRegistedConverterReturnsNull() {
+        Map<String, Object> map = singletonMap("optionalNumber", 35);
+
+        mapToObjectConverter.registerConverter(Integer.class, value -> null);
+
+        ClassWithOptionalField actual = mapToObjectConverter.convert(map, ClassWithOptionalField.class);
+
+        ClassWithOptionalField expected = new ClassWithOptionalField();
+        expected.optionalNumber = Optional.empty();
 
         assertThat(actual, sameBeanAs(expected));
     }

@@ -175,7 +175,7 @@ public class MapToObjectConverter {
         });
     }
 
-    private static void setOptionalField(Object object, Field field, Object value) {
+    private void setOptionalField(Object object, Field field, Object value) {
         if (value == null) {
             setField(object, field, Optional.empty());
         } else {
@@ -186,6 +186,11 @@ public class MapToObjectConverter {
             Type parameterType = ((ParameterizedTypeImpl) genericType).getActualTypeArguments()[0];
             if (!(parameterType instanceof Class<?>)) {
                 throw exception("Wildcards are not supported. Field '%s' is 'Optional<%s>'", field.getName(), parameterType);
+            }
+
+            if (converters.containsKey(parameterType)) {
+                setField(object, field, Optional.ofNullable(converters.get(parameterType).convert(value)));
+                return;
             }
 
             if (((Class<?>) parameterType).isEnum()) {
