@@ -13,6 +13,7 @@ import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 
+@SuppressWarnings("unused")
 public class MapToObjectConverterTest_OptionalFields {
 
     @Rule

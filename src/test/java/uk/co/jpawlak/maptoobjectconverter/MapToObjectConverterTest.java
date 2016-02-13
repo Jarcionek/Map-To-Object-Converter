@@ -12,6 +12,7 @@ import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 
+@SuppressWarnings({"SameParameterValue", "unused"})
 public class MapToObjectConverterTest {
 
     @Rule
@@ -49,11 +50,11 @@ public class MapToObjectConverterTest {
 
 
 
-    public static class SimpleClassWithPrimitiveField {
+    private static class SimpleClassWithPrimitiveField {
         int number;
     }
 
-    public static class SimpleClassWithPrimitiveBooleanField {
+    private static class SimpleClassWithPrimitiveBooleanField {
         boolean trueOrFalse;
     }
 

@@ -16,6 +16,7 @@ import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 
+@SuppressWarnings({"unused", "unchecked"})
 public class MapToObjectConverterTest_SingleValueConverter {
 
     @Rule
@@ -197,7 +198,6 @@ public class MapToObjectConverterTest_SingleValueConverter {
         mapToObjectConverter.convert(map, ClassWithOptionalField.class);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void throwsExceptionWhenRegisteredConverterReturnsValueOfDifferentTypeThanTypeParameter() {
         Map<String, Object> map = singletonMap("optionalNumber", 1234);
