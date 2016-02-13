@@ -94,6 +94,9 @@ public class MapToObjectConverter {
     }
 
     public <T> MapToObjectConverter registerConverter(Class<T> aClass, SingleValueConverter<T> singleValueConverter) {
+        if (aClass == Optional.class) {
+            throw exception("Cannot register convert for '%s'. Register converter for the type parameter instead.", Optional.class.getName());
+        }
         converters.put(aClass, singleValueConverter);
         return this;
     }

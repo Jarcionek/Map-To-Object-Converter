@@ -23,6 +23,16 @@ public class MapToObjectConverterTest_SingleValueConverter {
 
 
 
+    @Test
+    public void throwsExceptionWhenTryingToRegisterConverterForJavaOptional() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("Cannot register convert for 'java.util.Optional'. Register converter for the type parameter instead."));
+
+        mapToObjectConverter.registerConverter(Optional.class, value -> null);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public static class SimpleClass {
         String string;
         int number;
