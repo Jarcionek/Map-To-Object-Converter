@@ -1,13 +1,11 @@
 package uk.co.jpawlak.maptoobjectconverter;
 
 import sun.reflect.ReflectionFactory;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -161,51 +159,14 @@ public class MapToObjectConverter {
 
     private <T> void setFields(Map<String, Object> map, Class<T> targetClass, T result) {
         fieldsOf(targetClass).forEach(field -> {
-            if (field.getType() == Optional.class) {
-                setOptionalField(result, field, map.get(field.getName()));
-            } else {
-                SingleValueConverter<?> converter = converters.getConverterFor(field.getType());
-                Object value = map.get(field.getName());
-                Object convertedValue = converter.convert(value);
-                if (convertedValue == null) {
-                    throw new RegisteredConverterException(String.format("Null values require fields to be Optional. Registered converter for type '%s' returned null.", field.getType().getName()));
-                }
-                setField(result, field, convertedValue);
-            }
-        });
-    }
-
-    private void setOptionalField(Object object, Field field, Object value) {
-        Type genericType = field.getGenericType();
-        if (!(genericType instanceof ParameterizedTypeImpl)) {
-            throw exception("Raw types are not supported. Field '%s' is 'Optional'", field.getName());
-        }
-        Type parameterType = ((ParameterizedTypeImpl) genericType).getActualTypeArguments()[0];
-        if (!(parameterType instanceof Class<?>)) {
-            throw exception("Wildcards are not supported. Field '%s' is 'Optional<%s>'", field.getName(), parameterType);
-        }
-
-        if (converters.hasConverterFor((Class<?>) parameterType)) {
-            SingleValueConverter<?> converter = converters.getConverterFor((Class<?>) parameterType);
+            SingleValueConverter<?> converter = converters.getConverterFor(field.getGenericType(), field.getName());
+            Object value = map.get(field.getName());
             Object convertedValue = converter.convert(value);
-            if (convertedValue != null && convertedValue.getClass() != parameterType) {
-                throw new RegisteredConverterException(String.format("Cannot assign value of type 'Optional<%s>' returned by registered converter to field '%s' of type 'Optional<%s>'", convertedValue.getClass().getName(), field.getName(), parameterType.getTypeName()));
+            if (convertedValue == null) {
+                throw new RegisteredConverterException(String.format("Null values require fields to be Optional. Registered converter for type '%s' returned null.", field.getType().getName()));
             }
-            setField(object, field, Optional.ofNullable(convertedValue));
-        } else if (value == null) {
-            setField(object, field, Optional.empty());
-        } else {
-            if (((Class<?>) parameterType).isEnum()) {
-                setField(object, field, Optional.of(asEnum((Class<?>) parameterType, value)));
-                return;
-            }
-
-            if (value.getClass() != parameterType) {
-                throw exception("Cannot assign value of type 'Optional<%s>' to field '%s' of type 'Optional<%s>'", value.getClass().getName(), field.getName(), parameterType.getTypeName());
-            }
-
-            setField(object, field, Optional.of(value));
-        }
+            setField(result, field, convertedValue);
+        });
     }
 
     private static void setField(Object object, Field field, Object value) {
@@ -228,21 +189,6 @@ public class MapToObjectConverter {
         return fields
                 .filter(field -> (field.getModifiers() & Modifier.STATIC) == 0)
                 .filter(field -> !field.isSynthetic());
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <E> E asEnum(Class<E> enumClass, Object value) {
-        try {
-            return (E) enumClass.getDeclaredMethod("valueOf", String.class).invoke(null, value);
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | IllegalArgumentException e) {
-            if (e instanceof InvocationTargetException && e.getCause() instanceof IllegalArgumentException) {
-                throw exception("'%s' does not have an enum named '%s'", enumClass.getName(), value);
-            }
-            if (e instanceof IllegalArgumentException) {
-                throw exception("Cannot convert value of type '%s' to enum", value.getClass().getName());
-            }
-            throw new RuntimeException(e);
-        }
     }
 
     private static IllegalArgumentException exception(String message, Object... args) {

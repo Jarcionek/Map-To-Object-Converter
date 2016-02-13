@@ -1,39 +1,85 @@
 package uk.co.jpawlak.maptoobjectconverter;
 
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
+
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 class Converters {
 
-    private final Map<Class<?>, SingleValueConverter<?>> converters = new HashMap<>();
+    private final Map<Type, SingleValueConverter<?>> converters = new HashMap<>();
 
     <T> void registerConverter(Class<T> aClass, SingleValueConverter<T> singleValueConverter) {
         if (aClass == null) {
-            throw new IllegalArgumentException("Cannot register converter for null class.");
+            throw exception("Cannot register converter for null class.");
         }
         if (aClass == Optional.class) {
-            throw new IllegalArgumentException("Cannot register convert for 'java.util.Optional'. Register converter for the type parameter instead.");
+            throw exception("Cannot register convert for 'java.util.Optional'. Register converter for the type parameter instead.");
         }
         if (singleValueConverter == null) {
-            throw new IllegalArgumentException("Registered converter cannot be null.");
+            throw exception("Registered converter cannot be null.");
         }
         converters.put(aClass, new ExceptionWrappingSingleValueConverter<>(singleValueConverter));
     }
 
-    boolean hasConverterFor(Class<?> aClass) {
-        return converters.containsKey(aClass);
+    boolean hasConverterFor(Type type) {
+        return converters.containsKey(type);
     }
 
-    SingleValueConverter<?> getConverterFor(Class<?> aClass) {
-        if (converters.containsKey(aClass)) {
-            return converters.get(aClass);
+    SingleValueConverter<?> getConverterFor(Type type, String fieldName) {
+        if (type == Optional.class) {
+            throw exception("Raw types are not supported. Field '%s' is 'Optional'", fieldName);
         }
-        if (aClass.isEnum()) {
-            return value -> asEnum(aClass, value);
+
+        if (type instanceof ParameterizedTypeImpl && ((ParameterizedTypeImpl) type).getRawType() == Optional.class) {
+            Type parameterType = ((ParameterizedTypeImpl) type).getActualTypeArguments()[0];
+            if (!(parameterType instanceof Class<?>)) {
+                throw exception("Wildcards are not supported. Field '%s' is 'Optional<%s>'", fieldName, parameterType);
+            }
+            return optionalValueConverter(type, fieldName);
         }
+
+        if (converters.containsKey(type)) {
+            return converters.get(type);
+        }
+
+        if (type instanceof Class<?> && ((Class<?>) type).isEnum()) {
+            return value -> asEnum(((Class<?>) type), value);
+        }
+
         return value -> value;
+    }
+
+    private SingleValueConverter<?> optionalValueConverter(Type type, String fieldName) {
+        return value -> {
+            Type parameterType = ((ParameterizedTypeImpl) type).getActualTypeArguments()[0];
+
+            if (this.hasConverterFor(parameterType)) {
+                SingleValueConverter<?> converter = this.getConverterFor(parameterType, fieldName);
+                Object convertedValue = converter.convert(value);
+                if (convertedValue != null && convertedValue.getClass() != parameterType) {
+                    throw new RegisteredConverterException(String.format("Cannot assign value of type 'Optional<%s>' returned by registered converter to field '%s' of type 'Optional<%s>'", convertedValue.getClass().getName(), fieldName, parameterType.getTypeName()));
+                }
+                return Optional.ofNullable(convertedValue);
+            }
+
+            if (value == null) {
+                return Optional.empty();
+            }
+
+            if (((Class<?>) parameterType).isEnum()) {
+                return Optional.of(asEnum((Class<?>) parameterType, value));
+            }
+
+            if (value.getClass() != parameterType) {
+                throw exception("Cannot assign value of type 'Optional<%s>' to field '%s' of type 'Optional<%s>'", value.getClass().getName(), fieldName, parameterType.getTypeName());
+            }
+
+            return Optional.of(value);
+        };
     }
 
     @SuppressWarnings("unchecked")
