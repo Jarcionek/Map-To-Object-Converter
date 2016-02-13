@@ -57,33 +57,25 @@ class Converters {
         return value -> {
             Type parameterType = ((ParameterizedTypeImpl) type).getActualTypeArguments()[0];
 
-            if (this.hasConverterFor(parameterType)) {
-                SingleValueConverter<?> converter = this.getConverterFor(parameterType, fieldName);
-                Object convertedValue = converter.convert(value);
-                if (convertedValue != null && convertedValue.getClass() != parameterType) {
+            SingleValueConverter<?> converter = this.getConverterFor(parameterType, fieldName);
+            Object convertedValue = converter.convert(value);
+
+            if (convertedValue != null && convertedValue.getClass() != parameterType) {
+                if (this.hasConverterFor(parameterType)) {
                     throw new RegisteredConverterException(String.format("Cannot assign value of type 'Optional<%s>' returned by registered converter to field '%s' of type 'Optional<%s>'", convertedValue.getClass().getName(), fieldName, parameterType.getTypeName()));
+                } else {
+                    throw exception("Cannot assign value of type 'Optional<%s>' to field '%s' of type 'Optional<%s>'", value.getClass().getName(), fieldName, parameterType.getTypeName());
                 }
-                return Optional.ofNullable(convertedValue);
             }
-
-            if (value == null) {
-                return Optional.empty();
-            }
-
-            if (((Class<?>) parameterType).isEnum()) {
-                return Optional.of(asEnum((Class<?>) parameterType, value));
-            }
-
-            if (value.getClass() != parameterType) {
-                throw exception("Cannot assign value of type 'Optional<%s>' to field '%s' of type 'Optional<%s>'", value.getClass().getName(), fieldName, parameterType.getTypeName());
-            }
-
-            return Optional.of(value);
+            return Optional.ofNullable(convertedValue);
         };
     }
 
     @SuppressWarnings("unchecked")
     private static <E> E asEnum(Class<E> enumClass, Object value) {
+        if (value == null) {
+            return null;
+        }
         try {
             return (E) enumClass.getDeclaredMethod("valueOf", String.class).invoke(null, value);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | IllegalArgumentException e) {
