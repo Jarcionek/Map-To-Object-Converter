@@ -165,7 +165,7 @@ public class MapToObjectConverter {
                 setOptionalField(result, field, map.get(field.getName()));
             } else {
                 if (converters.containsKey(field.getType())) {
-                    Object value = converters.get(field.getType()).convert(map.get(field.getName()));
+                    Object value = convertedValue(converters.get(field.getType()), map.get(field.getName()));
                     if (value == null) {
                         throw new RegisteredConverterException(String.format("Null values require fields to be Optional. Registered Converter for type '%s' returned null for field '%s'", field.getType().getSimpleName(), field.getName()));
                     }
@@ -193,7 +193,7 @@ public class MapToObjectConverter {
             }
 
             if (converters.containsKey(parameterType)) {
-                setField(object, field, Optional.ofNullable(converters.get(parameterType).convert(value)));
+                setField(object, field, Optional.ofNullable(convertedValue(converters.get(parameterType), value)));
                 return;
             }
 
@@ -218,6 +218,14 @@ public class MapToObjectConverter {
             throw exception("Cannot assign value of type '%s' to field '%s' of type '%s'", value.getClass().getName(), field.getName(), field.getType().getName());
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static Object convertedValue(SingleValueConverter<?> converter, Object value) {
+        try {
+            return converter.convert(value);
+        } catch (Exception ex) {
+            throw new RegisteredConverterException(ex);
         }
     }
 

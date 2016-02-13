@@ -12,6 +12,7 @@ import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 
 public class MapToObjectConverterTest_SingleValueConverter {
 
@@ -82,7 +83,26 @@ public class MapToObjectConverterTest_SingleValueConverter {
         mapToObjectConverter.convert(map, SimpleClass.class);
     }
 
+    @Test
+    public void throwsExceptionWhenRegisteredConverterThrowsException() {
+        Map<String, Object> map = ImmutableMap.of(
+                "string", "whatever",
+                "number", 2
+        );
 
+        mapToObjectConverter
+                .registerConverter(String.class, value -> "x")
+                .registerConverter(int.class, value -> {
+                    throw new NullPointerException();
+                });
+
+        expectedException.expect(RegisteredConverterException.class);
+        expectedException.expectCause(instanceOf(NullPointerException.class));
+
+        mapToObjectConverter.convert(map, SimpleClass.class);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public static class ClassWithOptionalField {
         Optional<Integer> optionalNumber;
@@ -114,6 +134,21 @@ public class MapToObjectConverterTest_SingleValueConverter {
         expected.optionalNumber = Optional.empty();
 
         assertThat(actual, sameBeanAs(expected));
+    }
+
+    @Test
+    public void throwsExceptionWhenRegisteredConverterThrowsExceptionForOptionalField() {
+        Map<String, Object> map = singletonMap("optionalNumber", 35);
+
+        mapToObjectConverter
+                .registerConverter(Integer.class, value -> {
+                    throw new NullPointerException();
+                });
+
+        expectedException.expect(RegisteredConverterException.class);
+        expectedException.expectCause(instanceOf(NullPointerException.class));
+
+        mapToObjectConverter.convert(map, ClassWithOptionalField.class);
     }
 
 }

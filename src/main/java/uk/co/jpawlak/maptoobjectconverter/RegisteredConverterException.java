@@ -7,8 +7,12 @@ package uk.co.jpawlak.maptoobjectconverter;
  */
 public class RegisteredConverterException extends RuntimeException {
 
-    public RegisteredConverterException(String message) {
+    RegisteredConverterException(String message) {
         super(message);
+    }
+
+    RegisteredConverterException(Throwable cause) {
+        super(cause);
     }
 
 }
