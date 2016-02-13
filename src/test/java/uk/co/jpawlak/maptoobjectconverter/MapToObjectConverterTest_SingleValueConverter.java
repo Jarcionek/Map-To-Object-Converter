@@ -161,4 +161,34 @@ public class MapToObjectConverterTest_SingleValueConverter {
         mapToObjectConverter.convert(map, ClassWithOptionalField.class);
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private enum Enum {
+        VALUE_OF, CONVERTER
+    }
+
+    private static class ClassWithEnumFields {
+        Enum enumField;
+        Optional<Enum> optionalEnumField;
+    }
+
+    @Test
+    public void usesRegisteredEnumConverterInsteadOfValueOf() {
+        Map<String, Object> map = ImmutableMap.of(
+                "enumField", "VALUE_OF",
+                "optionalEnumField", "VALUE_OF"
+        );
+
+        mapToObjectConverter
+                .registerConverter(Enum.class, value -> Enum.CONVERTER);
+
+        ClassWithEnumFields actual = mapToObjectConverter.convert(map, ClassWithEnumFields.class);
+
+        ClassWithEnumFields expected = new ClassWithEnumFields();
+        expected.enumField = Enum.CONVERTER;
+        expected.optionalEnumField = Optional.of(Enum.CONVERTER);
+
+        assertThat(actual, sameBeanAs(expected));
+    }
+
 }
