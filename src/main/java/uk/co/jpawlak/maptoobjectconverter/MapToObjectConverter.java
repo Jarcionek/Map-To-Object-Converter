@@ -165,7 +165,11 @@ public class MapToObjectConverter {
                 setOptionalField(result, field, map.get(field.getName()));
             } else {
                 if (converters.containsKey(field.getType())) {
-                    setField(result, field, converters.get(field.getType()).convert(map.get(field.getName())));
+                    Object value = converters.get(field.getType()).convert(map.get(field.getName()));
+                    if (value == null) {
+                        throw new RegisteredConverterException(String.format("Null values require fields to be Optional. Registered Converter for type '%s' returned null for field '%s'", field.getType().getSimpleName(), field.getName()));
+                    }
+                    setField(result, field, value);
                 } else if (field.getType().isEnum()) {
                     setField(result, field, asEnum(field.getType(), map.get(field.getName())));
                 } else {

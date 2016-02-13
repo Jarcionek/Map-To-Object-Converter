@@ -11,6 +11,7 @@ import java.util.Optional;
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.singletonMap;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 public class MapToObjectConverterTest_SingleValueConverter {
 
@@ -62,6 +63,23 @@ public class MapToObjectConverterTest_SingleValueConverter {
         expected.number = 4;
 
         assertThat(actual, sameBeanAs(expected));
+    }
+
+    @Test
+    public void throwsExceptionWhenConverterReturnsNullAndFieldIsNotOptional() {
+        Map<String, Object> map = ImmutableMap.of(
+                "string", "whatever",
+                "number", 2
+        );
+
+        mapToObjectConverter
+                .registerConverter(String.class, value -> null)
+                .registerConverter(int.class, value -> (int) value);
+
+        expectedException.expect(RegisteredConverterException.class);
+        expectedException.expectMessage(equalTo("Null values require fields to be Optional. Registered Converter for type 'String' returned null for field 'string'"));
+
+        mapToObjectConverter.convert(map, SimpleClass.class);
     }
 
 
