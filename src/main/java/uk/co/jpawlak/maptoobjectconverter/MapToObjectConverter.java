@@ -12,7 +12,6 @@ import uk.co.jpawlak.maptoobjectconverter.exceptions.RegisteredConverterExceptio
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -165,7 +164,7 @@ public class MapToObjectConverter {
             Constructor<Object> objectNoArgConstructor = Object.class.getDeclaredConstructor();
             Constructor<?> constructor = REFLECTION_FACTORY.newConstructorForSerialization(targetClass, objectNoArgConstructor);
             return targetClass.cast(constructor.newInstance());
-        } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
+        } catch (Exception e) {
             throw new ConverterUnknownException(e);
         }
     }

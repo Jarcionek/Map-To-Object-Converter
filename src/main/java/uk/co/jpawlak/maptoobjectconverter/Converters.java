@@ -83,7 +83,7 @@ class Converters {
         }
         try {
             return (E) enumClass.getDeclaredMethod("valueOf", String.class).invoke(null, value);
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | IllegalArgumentException e) {
+        } catch (Exception e) {
             if (e instanceof InvocationTargetException && e.getCause() instanceof IllegalArgumentException) {
                 throw new ConverterEnumCreationException("'%s' does not have an enum named '%s'.", enumClass.getTypeName(), value);
             }
