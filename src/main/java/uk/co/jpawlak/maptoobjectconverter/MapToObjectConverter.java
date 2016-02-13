@@ -166,7 +166,7 @@ public class MapToObjectConverter {
                 if (converters.hasConverterFor(field.getType())) {
                     Object value = converters.convert(map.get(field.getName()), field.getType());
                     if (value == null) {
-                        throw new RegisteredConverterException(String.format("Null values require fields to be Optional. Registered Converter for type '%s' returned null for field '%s'", field.getType().getSimpleName(), field.getName()));
+                        throw new RegisteredConverterException(String.format("Null values require fields to be Optional. Registered Converter for type '%s' returned null.", field.getType().getName()));
                     }
                     setField(result, field, value);
                 } else if (field.getType().isEnum()) {
