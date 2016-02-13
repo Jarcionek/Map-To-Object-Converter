@@ -161,6 +161,18 @@ public class MapToObjectConverterTest_SingleValueConverter {
         mapToObjectConverter.convert(map, ClassWithOptionalField.class);
     }
 
+    @Test
+    public void throwsExceptionWhenRegisteredConverterReturnsValueOfDifferentTypeThanTypeParameter() {
+        Map<String, Object> map = singletonMap("optionalNumber", 1234);
+
+        mapToObjectConverter.registerConverter(Integer.class, (SingleValueConverter) value -> "a string");
+
+        expectedException.expect(RegisteredConverterException.class);
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'Optional<java.lang.String>' returned by registered converter to field 'optionalNumber' of type 'Optional<java.lang.Integer>'"));
+
+        mapToObjectConverter.convert(map, ClassWithOptionalField.class);
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private enum Enum {

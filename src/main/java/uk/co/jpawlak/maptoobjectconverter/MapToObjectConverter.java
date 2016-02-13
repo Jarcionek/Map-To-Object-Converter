@@ -196,7 +196,11 @@ public class MapToObjectConverter {
             }
 
             if (converters.containsKey(parameterType)) {
-                setField(object, field, Optional.ofNullable(convertedValue(converters.get(parameterType), value)));
+                Object convertedValue = convertedValue(converters.get(parameterType), value);
+                if (convertedValue != null && convertedValue.getClass() != parameterType) {
+                    throw new RegisteredConverterException(String.format("Cannot assign value of type 'Optional<%s>' returned by registered converter to field '%s' of type 'Optional<%s>'", convertedValue.getClass().getName(), field.getName(), parameterType.getTypeName()));
+                }
+                setField(object, field, Optional.ofNullable(convertedValue));
                 return;
             }
 
