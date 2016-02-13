@@ -3,6 +3,8 @@ package uk.co.jpawlak.maptoobjectconverter;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterEnumCreationException;
+import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterNullValueException;
 
 import java.util.Map;
 import java.util.Optional;
@@ -46,7 +48,7 @@ public class MapToObjectConverterTest_EnumFields {
     public void throwsExceptionWhenValueIsNull() {
         Map<String, Object> map = singletonMap("x", null);
 
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ConverterNullValueException.class);
         expectedException.expectMessage(equalTo("Null values require fields to be Optional. Null values for fields: 'x'"));
 
         mapToObjectConverter.convert(map, ClassWithEnumField.class);
@@ -56,7 +58,7 @@ public class MapToObjectConverterTest_EnumFields {
     public void throwsExceptionWhenThereIsNoEnumForString() {
         Map<String, Object> map = singletonMap("x", "blah");
 
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ConverterEnumCreationException.class);
         expectedException.expectMessage(equalTo("'uk.co.jpawlak.maptoobjectconverter.MapToObjectConverterTest_EnumFields$MyEnum' does not have an enum named 'blah'"));
 
         mapToObjectConverter.convert(map, ClassWithEnumField.class);
@@ -66,7 +68,7 @@ public class MapToObjectConverterTest_EnumFields {
     public void throwsExceptionWhenTryingToConvertNonStringToEnum() {
         Map<String, Object> map = singletonMap("x", 123);
 
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ConverterEnumCreationException.class);
         expectedException.expectMessage(equalTo("Cannot convert value of type 'java.lang.Integer' to enum"));
 
         mapToObjectConverter.convert(map, ClassWithEnumField.class);
@@ -106,7 +108,7 @@ public class MapToObjectConverterTest_EnumFields {
     public void throwsExceptionWhenThereIsNoEnumForStringAndFieldIsOptional() {
         Map<String, Object> map = singletonMap("x", "blah");
 
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ConverterEnumCreationException.class);
         expectedException.expectMessage(equalTo("'uk.co.jpawlak.maptoobjectconverter.MapToObjectConverterTest_EnumFields$MyEnum' does not have an enum named 'blah'"));
 
         mapToObjectConverter.convert(map, ClassWithOptionalEnumField.class);
@@ -116,7 +118,7 @@ public class MapToObjectConverterTest_EnumFields {
     public void throwsExceptionWhenTryingToConvertNonStringToEnumAndFieldIsOptional() {
         Map<String, Object> map = singletonMap("x", 123);
 
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ConverterEnumCreationException.class);
         expectedException.expectMessage(equalTo("Cannot convert value of type 'java.lang.Integer' to enum"));
 
         mapToObjectConverter.convert(map, ClassWithOptionalEnumField.class);

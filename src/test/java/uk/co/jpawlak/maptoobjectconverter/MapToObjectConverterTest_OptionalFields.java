@@ -3,6 +3,9 @@ package uk.co.jpawlak.maptoobjectconverter;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterIllegalArgumentException;
+import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterNullValueException;
+import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterTypeMismatchException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +37,7 @@ public class MapToObjectConverterTest_OptionalFields {
         map.put("street", null);
         map.put("postcode", "ABC 123");
 
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ConverterNullValueException.class);
         expectedException.expectMessage("Null values require fields to be Optional. Null values for fields: 'street'");
 
         mapToObjectConverter.convert(map, ClassWithNonOptionalFields.class);
@@ -46,7 +49,7 @@ public class MapToObjectConverterTest_OptionalFields {
         map.put("street", null);
         map.put("postcode", null);
 
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ConverterNullValueException.class);
         expectedException.expectMessage("Null values require fields to be Optional. Null values for fields: 'street', 'postcode'");
 
         mapToObjectConverter.convert(map, ClassWithNonOptionalFields.class);
@@ -86,7 +89,7 @@ public class MapToObjectConverterTest_OptionalFields {
     public void throwsExceptionForTypeMismatch() {
         Map<String, Object> map = singletonMap("optionalAddress", 123);
 
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ConverterTypeMismatchException.class);
         expectedException.expectMessage(equalTo("Cannot assign value of type 'Optional<java.lang.Integer>' to field 'optionalAddress' of type 'Optional<java.lang.String>'"));
 
         mapToObjectConverter.convert(map, ClassWithOptionalField.class);
@@ -102,7 +105,7 @@ public class MapToObjectConverterTest_OptionalFields {
     public void throwsExceptionForClassWithOptionalWildcardField() {
         Map<String, Object> map = singletonMap("x", "abc");
 
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ConverterIllegalArgumentException.class);
         expectedException.expectMessage(equalTo("Wildcards are not supported. Field 'x' is 'Optional<?>'"));
 
         mapToObjectConverter.convert(map, ClassWithOptionalWildcardField.class);
@@ -118,7 +121,7 @@ public class MapToObjectConverterTest_OptionalFields {
     public void throwsExceptionForClassWithOptionalBoundedWildcardField() {
         Map<String, Object> map = singletonMap("x", "abc");
 
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ConverterIllegalArgumentException.class);
         expectedException.expectMessage(equalTo("Wildcards are not supported. Field 'x' is 'Optional<T>'"));
 
         mapToObjectConverter.convert(map, ClassWithOptionalBoundedWildcardField.class);
@@ -134,7 +137,7 @@ public class MapToObjectConverterTest_OptionalFields {
     public void throwsExceptionForClassWithRawOptional() {
         Map<String, Object> map = singletonMap("z", "abc");
 
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ConverterIllegalArgumentException.class);
         expectedException.expectMessage("Raw types are not supported. Field 'z' is 'Optional'");
 
         mapToObjectConverter.convert(map, ClassWithRawOptional.class);

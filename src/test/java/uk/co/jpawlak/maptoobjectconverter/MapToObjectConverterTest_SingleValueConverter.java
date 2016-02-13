@@ -4,6 +4,10 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterIllegalArgumentException;
+import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterNullValueException;
+import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterTypeMismatchException;
+import uk.co.jpawlak.maptoobjectconverter.exceptions.RegisteredConverterException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +34,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
 
     @Test
     public void throwsExceptionWhenTryingToRegisterConverterForJavaOptional() {
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ConverterIllegalArgumentException.class);
         expectedException.expectMessage(equalTo("Cannot register convert for 'java.util.Optional'. Register converter for the type parameter instead."));
 
         mapToObjectConverter.registerConverter(Optional.class, value -> null);
@@ -38,7 +42,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
 
     @Test
     public void throwsExceptionWhenTryingToRegisterNullConverter() {
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ConverterIllegalArgumentException.class);
         expectedException.expectMessage(equalTo("Registered converter cannot be null."));
 
         mapToObjectConverter.registerConverter(String.class, null);
@@ -46,7 +50,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
 
     @Test
     public void throwsExceptionWhenTryingToRegisterConverterForNullType() {
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ConverterIllegalArgumentException.class);
         expectedException.expectMessage(equalTo("Cannot register converter for null class."));
 
         mapToObjectConverter.registerConverter(null, v -> v);
@@ -315,7 +319,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
     public void throwsExceptionWithCorrectlyFormattedPrimitiveArrayTypeForTypeMismatch() {
         Map<String, Object> map = singletonMap("numbers", "1,2,3");
 
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ConverterTypeMismatchException.class);
         expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.String' to field 'numbers' of type 'int[]'"));
 
         mapToObjectConverter.convert(map, ClassWithPrimitiveArray.class);
@@ -325,7 +329,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
     public void throwsExceptionWithCorrectlyFormattedObjectArrayTypeForTypeMismatch() {
         Map<String, Object> map = singletonMap("numbers", new int[] {1, 2, 3});
 
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ConverterTypeMismatchException.class);
         expectedException.expectMessage(equalTo("Cannot assign value of type 'int[]' to field 'numbers' of type 'java.lang.Integer[]'"));
 
         mapToObjectConverter.convert(map, ClassWithIntegerArray.class);
@@ -347,7 +351,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
     public void throwsExceptionWithCorrectlyFormattedPrimitiveArrayTypeForOptionalTypeMismatch() {
         Map<String, Object> map = singletonMap("numbers", new Integer[] {1, 2, 3});
 
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ConverterTypeMismatchException.class);
         expectedException.expectMessage(equalTo("Cannot assign value of type 'Optional<java.lang.Integer[]>' to field 'numbers' of type 'Optional<int[]>'"));
 
         mapToObjectConverter.convert(map, ClassWithOptionalPrimitiveArray.class);
@@ -399,7 +403,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
         mapToObjectConverter
                 .registerConverter(List.class, value -> asList(3, 6, 9));
 
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ConverterNullValueException.class);
         expectedException.expectMessage(equalTo("Null values require fields to be Optional. Null values for fields: 'list'"));
 
         mapToObjectConverter.convert(map, ClassWithListOfUnknownType.class);
