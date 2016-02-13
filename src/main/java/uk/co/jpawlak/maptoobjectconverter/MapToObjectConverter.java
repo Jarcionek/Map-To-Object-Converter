@@ -163,7 +163,7 @@ public class MapToObjectConverter {
             Object value = map.get(field.getName());
             Object convertedValue = converter.convert(value);
             if (convertedValue == null) {
-                throw new RegisteredConverterException(String.format("Null values require fields to be Optional. Registered converter for type '%s' returned null.", field.getType().getName()));
+                throw new RegisteredConverterException(String.format("Null values require fields to be Optional. Registered converter for type '%s' returned null.", field.getType().getTypeName()));
             }
             setField(result, field, convertedValue);
         });
@@ -174,7 +174,7 @@ public class MapToObjectConverter {
             field.setAccessible(true);
             field.set(object, value);
         } catch (IllegalArgumentException e) {
-            throw exception("Cannot assign value of type '%s' to field '%s' of type '%s'", value.getClass().getName(), field.getName(), field.getType().getName());
+            throw exception("Cannot assign value of type '%s' to field '%s' of type '%s'", value.getClass().getTypeName(), field.getName(), field.getType().getTypeName());
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }

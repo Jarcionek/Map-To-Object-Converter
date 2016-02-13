@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
+import static java.util.Arrays.stream;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -251,6 +252,115 @@ public class MapToObjectConverterTest_SingleValueConverter {
         expected.optionalEnumField = Optional.of(Enum.CONVERTER);
 
         assertThat(actual, sameBeanAs(expected));
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private class ClassWithPrimitiveArray {
+        int[] numbers;
+    }
+    private class ClassWithOptionalPrimitiveArray {
+        Optional<int[]> numbers;
+    }
+
+    private class ClassWithIntegerArray {
+        Integer[] numbers;
+    }
+
+    @Test
+    public void usesRegisteredConverterForPrimitiveArrayField() {
+        Map<String, Object> map = singletonMap("numbers", "1,2,3");
+
+        mapToObjectConverter.registerConverter(int[].class, value -> stream(value.toString().split(",")).mapToInt(Integer::parseInt).toArray());
+
+        ClassWithPrimitiveArray actual = mapToObjectConverter.convert(map, ClassWithPrimitiveArray.class);
+
+        ClassWithPrimitiveArray expected = new ClassWithPrimitiveArray();
+        expected.numbers = new int[] {1, 2, 3};
+
+        assertThat(actual, sameBeanAs(expected));
+    }
+
+    @Test
+    public void usesRegisteredConverterForOptionalPrimitiveArrayField() {
+        Map<String, Object> map = singletonMap("numbers", "2,4,8,16");
+
+        mapToObjectConverter.registerConverter(int[].class, value -> stream(value.toString().split(",")).mapToInt(Integer::parseInt).toArray());
+
+        ClassWithOptionalPrimitiveArray actual = mapToObjectConverter.convert(map, ClassWithOptionalPrimitiveArray.class);
+
+        ClassWithOptionalPrimitiveArray expected = new ClassWithOptionalPrimitiveArray();
+        expected.numbers = Optional.of(new int[] {2, 4, 8, 16});
+
+        assertThat(actual, sameBeanAs(expected));
+    }
+
+    @Test
+    public void usesRegisteredConverterForObjectArrayField() {
+        Map<String, Object> map = singletonMap("numbers", "whatever");
+
+        mapToObjectConverter.registerConverter(Integer[].class, value -> new Integer[] {7, 15});
+
+        ClassWithIntegerArray actual = mapToObjectConverter.convert(map, ClassWithIntegerArray.class);
+
+        ClassWithIntegerArray expected = new ClassWithIntegerArray();
+        expected.numbers =  new Integer[] {7, 15};
+
+        assertThat(actual, sameBeanAs(expected));
+    }
+
+    @Test
+    public void throwsExceptionWithCorrectlyFormattedPrimitiveArrayTypeForTypeMismatch() {
+        Map<String, Object> map = singletonMap("numbers", "1,2,3");
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'java.lang.String' to field 'numbers' of type 'int[]'"));
+
+        mapToObjectConverter.convert(map, ClassWithPrimitiveArray.class);
+    }
+
+    @Test
+    public void throwsExceptionWithCorrectlyFormattedObjectArrayTypeForTypeMismatch() {
+        Map<String, Object> map = singletonMap("numbers", new int[] {1, 2, 3});
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'int[]' to field 'numbers' of type 'java.lang.Integer[]'"));
+
+        mapToObjectConverter.convert(map, ClassWithIntegerArray.class);
+    }
+
+    @Test
+    public void throwsExceptionWithCorrectlyFormattedObjectArrayTypeWhenConverterReturnsNullForNonOptionalField() {
+        Map<String, Object> map = singletonMap("numbers", new int[] {1, 2, 3});
+
+        mapToObjectConverter.registerConverter(Integer[].class, value -> null);
+
+        expectedException.expect(RegisteredConverterException.class);
+        expectedException.expectMessage(equalTo("Null values require fields to be Optional. Registered converter for type 'java.lang.Integer[]' returned null."));
+
+        mapToObjectConverter.convert(map, ClassWithIntegerArray.class);
+    }
+
+    @Test
+    public void throwsExceptionWithCorrectlyFormattedPrimitiveArrayTypeForOptionalTypeMismatch() {
+        Map<String, Object> map = singletonMap("numbers", new Integer[] {1, 2, 3});
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'Optional<java.lang.Integer[]>' to field 'numbers' of type 'Optional<int[]>'"));
+
+        mapToObjectConverter.convert(map, ClassWithOptionalPrimitiveArray.class);
+    }
+
+    @Test
+    public void throwsExceptionWithCorrectlyFormattedPrimitiveArrayTypeForOptionalTypeMismatchWithRegisteredConverter() {
+        Map<String, Object> map = singletonMap("numbers", "whatever");
+
+        mapToObjectConverter.registerConverter(int[].class, (SingleValueConverter) value -> new Integer[][] {{5}});
+
+        expectedException.expect(RegisteredConverterException.class);
+        expectedException.expectMessage(equalTo("Cannot assign value of type 'Optional<java.lang.Integer[][]>' returned by registered converter to field 'numbers' of type 'Optional<int[]>'"));
+
+        mapToObjectConverter.convert(map, ClassWithOptionalPrimitiveArray.class);
     }
 
 }

@@ -62,9 +62,9 @@ class Converters {
 
             if (convertedValue != null && convertedValue.getClass() != parameterType) {
                 if (this.hasConverterFor(parameterType)) {
-                    throw new RegisteredConverterException(String.format("Cannot assign value of type 'Optional<%s>' returned by registered converter to field '%s' of type 'Optional<%s>'", convertedValue.getClass().getName(), fieldName, parameterType.getTypeName()));
+                    throw new RegisteredConverterException(String.format("Cannot assign value of type 'Optional<%s>' returned by registered converter to field '%s' of type 'Optional<%s>'", convertedValue.getClass().getTypeName(), fieldName, parameterType.getTypeName()));
                 } else {
-                    throw exception("Cannot assign value of type 'Optional<%s>' to field '%s' of type 'Optional<%s>'", value.getClass().getName(), fieldName, parameterType.getTypeName());
+                    throw exception("Cannot assign value of type 'Optional<%s>' to field '%s' of type 'Optional<%s>'", value.getClass().getTypeName(), fieldName, parameterType.getTypeName());
                 }
             }
             return Optional.ofNullable(convertedValue);
@@ -80,10 +80,10 @@ class Converters {
             return (E) enumClass.getDeclaredMethod("valueOf", String.class).invoke(null, value);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | IllegalArgumentException e) {
             if (e instanceof InvocationTargetException && e.getCause() instanceof IllegalArgumentException) {
-                throw exception("'%s' does not have an enum named '%s'", enumClass.getName(), value);
+                throw exception("'%s' does not have an enum named '%s'", enumClass.getTypeName(), value);
             }
             if (e instanceof IllegalArgumentException) {
-                throw exception("Cannot convert value of type '%s' to enum", value.getClass().getName());
+                throw exception("Cannot convert value of type '%s' to enum", value.getClass().getTypeName());
             }
             throw new RuntimeException(e);
         }
