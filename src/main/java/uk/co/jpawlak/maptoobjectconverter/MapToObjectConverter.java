@@ -9,7 +9,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -26,7 +25,7 @@ public class MapToObjectConverter {
 
     private static final ReflectionFactory REFLECTION_FACTORY = ReflectionFactory.getReflectionFactory();
 
-    private final Map<Class<?>, SingleValueConverter<?>> converters = new HashMap<>();
+    private final Converters converters = new Converters();
 
     /**
      * Converts Map&lt;String, Object&gt; into an instance of <code>targetClass</code>.
@@ -94,10 +93,7 @@ public class MapToObjectConverter {
     }
 
     public <T> MapToObjectConverter registerConverter(Class<T> aClass, SingleValueConverter<T> singleValueConverter) {
-        if (aClass == Optional.class) {
-            throw exception("Cannot register convert for '%s'. Register converter for the type parameter instead.", Optional.class.getName());
-        }
-        converters.put(aClass, singleValueConverter);
+        converters.registerConverter(aClass, singleValueConverter);
         return this;
     }
 
@@ -167,8 +163,8 @@ public class MapToObjectConverter {
             if (field.getType() == Optional.class) {
                 setOptionalField(result, field, map.get(field.getName()));
             } else {
-                if (converters.containsKey(field.getType())) {
-                    Object value = convertedValue(converters.get(field.getType()), map.get(field.getName()));
+                if (converters.hasConverterFor(field.getType())) {
+                    Object value = converters.convert(map.get(field.getName()), field.getType());
                     if (value == null) {
                         throw new RegisteredConverterException(String.format("Null values require fields to be Optional. Registered Converter for type '%s' returned null for field '%s'", field.getType().getSimpleName(), field.getName()));
                     }
@@ -192,8 +188,8 @@ public class MapToObjectConverter {
             throw exception("Wildcards are not supported. Field '%s' is 'Optional<%s>'", field.getName(), parameterType);
         }
 
-        if (converters.containsKey(parameterType)) {
-            Object convertedValue = convertedValue(converters.get(parameterType), value);
+        if (converters.hasConverterFor((Class<?>) parameterType)) {
+            Object convertedValue = converters.convert(value, (Class<?>) parameterType);
             if (convertedValue != null && convertedValue.getClass() != parameterType) {
                 throw new RegisteredConverterException(String.format("Cannot assign value of type 'Optional<%s>' returned by registered converter to field '%s' of type 'Optional<%s>'", convertedValue.getClass().getName(), field.getName(), parameterType.getTypeName()));
             }
@@ -222,14 +218,6 @@ public class MapToObjectConverter {
             throw exception("Cannot assign value of type '%s' to field '%s' of type '%s'", value.getClass().getName(), field.getName(), field.getType().getName());
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private static Object convertedValue(SingleValueConverter<?> converter, Object value) {
-        try {
-            return converter.convert(value);
-        } catch (Exception ex) {
-            throw new RegisteredConverterException(ex);
         }
     }
 
