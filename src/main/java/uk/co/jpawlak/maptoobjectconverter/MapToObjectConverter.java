@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -95,6 +96,11 @@ public class MapToObjectConverter {
         return this;
     }
 
+    public <T> MapToObjectConverter registerConverter(Type type, SingleValueConverter<?> singleValueConverter) {
+        converters.registerConverter(type, singleValueConverter);
+        return this;
+    }
+
     private static void checkParameters(Map<?, ?> map, Class<?> targetClass) {
         if (map == null) {
             throw exception("Map cannot be null");
@@ -137,8 +143,8 @@ public class MapToObjectConverter {
 
     private void checkOptionalFieldsForNullValues(Map<String, Object> map, Class<?> targetClass) {
         Set<String> fieldsNames = fieldsOf(targetClass)
-                .filter(field -> field .getType() != Optional.class && map.get(field.getName()) == null)
-                .filter(field -> !converters.hasConverterFor(field.getType()))
+                .filter(field -> field.getType() != Optional.class && map.get(field.getName()) == null)
+                .filter(field -> !converters.hasConverterFor(field.getGenericType()))
                 .map(Field::getName)
                 .collect(toCollection(LinkedHashSet::new));
 

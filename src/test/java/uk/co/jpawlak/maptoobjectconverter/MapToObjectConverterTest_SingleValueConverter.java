@@ -6,11 +6,13 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
+import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -361,6 +363,76 @@ public class MapToObjectConverterTest_SingleValueConverter {
         expectedException.expectMessage(equalTo("Cannot assign value of type 'Optional<java.lang.Integer[][]>' returned by registered converter to field 'numbers' of type 'Optional<int[]>'"));
 
         mapToObjectConverter.convert(map, ClassWithOptionalPrimitiveArray.class);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private class ClassWithRawList {
+        List list;
+    }
+
+    @Test
+    public void usesRegisteredConverterForRawList() {
+        Map<String, Object> map = singletonMap("list", null);
+
+        mapToObjectConverter
+                .registerConverter(List.class, value -> asList(3, 6, 9));
+
+        ClassWithRawList actual = mapToObjectConverter.convert(map, ClassWithRawList.class);
+
+        ClassWithRawList expected = new ClassWithRawList();
+        expected.list = asList(3, 6, 9);
+
+        assertThat(actual, sameBeanAs(expected));
+    }
+
+
+
+    private class ClassWithListOfUnknownType {
+        List<?> list;
+    }
+
+    @Test
+    public void throwsExceptionOtherThanRegisteredConverterExceptionWhenRegisteredConverterHasDifferentGenericTypeThanTheField() {
+        Map<String, Object> map = singletonMap("list", null);
+
+        mapToObjectConverter
+                .registerConverter(List.class, value -> asList(3, 6, 9));
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("Null values require fields to be Optional. Null values for fields: 'list'"));
+
+        mapToObjectConverter.convert(map, ClassWithListOfUnknownType.class);
+    }
+
+
+
+    private class ClassWithTwoLists {
+        List<Integer> numbers;
+        List<String> words;
+    }
+
+    @Test
+    public void allowsToRegisterConvertersForGenericTypes() throws NoSuchFieldException {
+        Map<String, Object> map = ImmutableMap.of(
+                "numbers", "whatever 1",
+                "words", "whatever 2"
+        );
+
+        mapToObjectConverter
+                .registerConverter(List.class, value -> {
+                    throw new AssertionError("shouldn't be used");
+                })
+                .registerConverter(ClassWithTwoLists.class.getDeclaredField("numbers").getGenericType(), value -> asList(-5, 0, 5))
+                .registerConverter(ClassWithTwoLists.class.getDeclaredField("words").getGenericType(), value -> asList("a", "b", "c"));
+
+        ClassWithTwoLists actual = mapToObjectConverter.convert(map, ClassWithTwoLists.class);
+
+        ClassWithTwoLists expected = new ClassWithTwoLists();
+        expected.numbers = asList(-5, 0, 5);
+        expected.words = asList("a", "b", "c");
+
+        assertThat(actual, sameBeanAs(expected));
     }
 
 }

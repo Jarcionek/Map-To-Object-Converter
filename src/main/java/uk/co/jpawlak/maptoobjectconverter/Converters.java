@@ -12,17 +12,17 @@ class Converters {
 
     private final Map<Type, SingleValueConverter<?>> converters = new HashMap<>();
 
-    <T> void registerConverter(Class<T> aClass, SingleValueConverter<T> singleValueConverter) {
-        if (aClass == null) {
+    void registerConverter(Type type, SingleValueConverter<?> singleValueConverter) {
+        if (type == null) {
             throw exception("Cannot register converter for null class.");
         }
-        if (aClass == Optional.class) {
+        if (type == Optional.class) {
             throw exception("Cannot register convert for 'java.util.Optional'. Register converter for the type parameter instead.");
         }
         if (singleValueConverter == null) {
             throw exception("Registered converter cannot be null.");
         }
-        converters.put(aClass, new ExceptionWrappingSingleValueConverter<>(singleValueConverter));
+        converters.put(type, new ExceptionWrappingSingleValueConverter<>(singleValueConverter));
     }
 
     boolean hasConverterFor(Type type) {
