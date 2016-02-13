@@ -161,6 +161,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
         mapToObjectConverter.convert(map, ClassWithOptionalField.class);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void throwsExceptionWhenRegisteredConverterReturnsValueOfDifferentTypeThanTypeParameter() {
         Map<String, Object> map = singletonMap("optionalNumber", 1234);
@@ -171,6 +172,20 @@ public class MapToObjectConverterTest_SingleValueConverter {
         expectedException.expectMessage(equalTo("Cannot assign value of type 'Optional<java.lang.String>' returned by registered converter to field 'optionalNumber' of type 'Optional<java.lang.Integer>'"));
 
         mapToObjectConverter.convert(map, ClassWithOptionalField.class);
+    }
+
+    @Test
+    public void usesValueReturnedByConverterWhenOriginalValueWasNull() {
+        Map<String, Object> map = singletonMap("optionalNumber", null);
+
+        mapToObjectConverter.registerConverter(Integer.class, value -> 852);
+
+        ClassWithOptionalField actual = mapToObjectConverter.convert(map, ClassWithOptionalField.class);
+
+        ClassWithOptionalField expected = new ClassWithOptionalField();
+        expected.optionalNumber = Optional.of(852);
+
+        assertThat(actual, sameBeanAs(expected));
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

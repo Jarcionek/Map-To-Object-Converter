@@ -183,27 +183,24 @@ public class MapToObjectConverter {
     }
 
     private void setOptionalField(Object object, Field field, Object value) {
-        if (value == null) {
+        Type genericType = field.getGenericType();
+        if (!(genericType instanceof ParameterizedTypeImpl)) {
+            throw exception("Raw types are not supported. Field '%s' is 'Optional'", field.getName());
+        }
+        Type parameterType = ((ParameterizedTypeImpl) genericType).getActualTypeArguments()[0];
+        if (!(parameterType instanceof Class<?>)) {
+            throw exception("Wildcards are not supported. Field '%s' is 'Optional<%s>'", field.getName(), parameterType);
+        }
+
+        if (converters.containsKey(parameterType)) {
+            Object convertedValue = convertedValue(converters.get(parameterType), value);
+            if (convertedValue != null && convertedValue.getClass() != parameterType) {
+                throw new RegisteredConverterException(String.format("Cannot assign value of type 'Optional<%s>' returned by registered converter to field '%s' of type 'Optional<%s>'", convertedValue.getClass().getName(), field.getName(), parameterType.getTypeName()));
+            }
+            setField(object, field, Optional.ofNullable(convertedValue));
+        } else if (value == null) {
             setField(object, field, Optional.empty());
         } else {
-            Type genericType = field.getGenericType();
-            if (!(genericType instanceof ParameterizedTypeImpl)) {
-                throw exception("Raw types are not supported. Field '%s' is 'Optional'", field.getName());
-            }
-            Type parameterType = ((ParameterizedTypeImpl) genericType).getActualTypeArguments()[0];
-            if (!(parameterType instanceof Class<?>)) {
-                throw exception("Wildcards are not supported. Field '%s' is 'Optional<%s>'", field.getName(), parameterType);
-            }
-
-            if (converters.containsKey(parameterType)) {
-                Object convertedValue = convertedValue(converters.get(parameterType), value);
-                if (convertedValue != null && convertedValue.getClass() != parameterType) {
-                    throw new RegisteredConverterException(String.format("Cannot assign value of type 'Optional<%s>' returned by registered converter to field '%s' of type 'Optional<%s>'", convertedValue.getClass().getName(), field.getName(), parameterType.getTypeName()));
-                }
-                setField(object, field, Optional.ofNullable(convertedValue));
-                return;
-            }
-
             if (((Class<?>) parameterType).isEnum()) {
                 setField(object, field, Optional.of(asEnum((Class<?>) parameterType, value)));
                 return;
