@@ -105,7 +105,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
                 .registerConverter(int.class, value -> (int) value);
 
         expectedException.expect(RegisteredConverterException.class);
-        expectedException.expectMessage(equalTo("Null values require fields to be Optional. Registered Converter for type 'java.lang.String' returned null."));
+        expectedException.expectMessage(equalTo("Null values require fields to be Optional. Registered converter for type 'java.lang.String' returned null."));
 
         mapToObjectConverter.convert(map, SimpleClass.class);
     }

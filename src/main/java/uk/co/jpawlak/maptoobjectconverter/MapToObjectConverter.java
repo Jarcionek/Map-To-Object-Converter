@@ -168,7 +168,7 @@ public class MapToObjectConverter {
                 Object value = map.get(field.getName());
                 Object convertedValue = converter.convert(value);
                 if (convertedValue == null) {
-                    throw new RegisteredConverterException(String.format("Null values require fields to be Optional. Registered Converter for type '%s' returned null.", field.getType().getName()));
+                    throw new RegisteredConverterException(String.format("Null values require fields to be Optional. Registered converter for type '%s' returned null.", field.getType().getName()));
                 }
                 setField(result, field, convertedValue);
             }
