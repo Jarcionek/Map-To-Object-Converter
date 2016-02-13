@@ -25,6 +25,51 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toCollection;
 
 /**
+ * Utility class that allows to easily convert Map&lt;String, Object&gt; into staticly typed object.
+ * <br><br>
+ * Values are mapped to fields using maps' keys and fields' names. Fields can be private final, no methods or annotations are required.
+ * The instance will be created without calling a constructor. All non-static fields in created objects are guaranteed
+ * to be non-null.
+ * <br><br>
+ * Example usage:
+ *
+ * <pre>
+ * public enum Gender {
+ *     MALE, FEMALE
+ * }
+ *
+ * public class Employee {
+ *
+ *     public final String name;
+ *     public final int age;
+ *     public final Gender gender;
+ *     public final Optional&lt;String&gt; phoneNumber;
+ *
+ *     public Employee(String name, int age, Gender gender, Optional&lt;String&gt; phoneNumber) {
+ *         this.name = name;
+ *         this.age = age;
+ *         this.gender = gender;
+ *         this.phoneNumber = phoneNumber;
+ *     }
+ *
+ * }
+ *
+ * public class Example {
+ *
+ *     public static void main(String... args) {
+ *         Map&lt;String, Object&gt; employeeMap = new HashMap&lt;&gt;();
+ *         employeeMap.put("name", "Jaroslaw Pawlak");
+ *         employeeMap.put("age", 26);
+ *         employeeMap.put("gender", "MALE");
+ *         employeeMap.put("phoneNumber", null);
+ *
+ *         MapToObjectConverter converter = new MapToObjectConverter();
+ *
+ *         Employee employee = converter.convert(employeeMap, Employee.class);
+ *     }
+ * }
+ * </pre>
+ *
  * @see #convert(Map, Class)
  */
 public class MapToObjectConverter {
@@ -35,49 +80,6 @@ public class MapToObjectConverter {
 
     /**
      * Converts Map&lt;String, Object&gt; into an instance of <code>targetClass</code>.
-     * <br><br>
-     * Values are mapped to fields using keys and fields' names. Fields can be private final, no methods are required.
-     * The instance will be created without calling a constructor. All non-static fields in created objects are guaranteed
-     * to be non-null.
-     * <br><br>
-     * Example usage:
-     *
-     * <pre>
-     * public enum Gender {
-     *     MALE, FEMALE
-     * }
-     *
-     * public class Employee {
-     *
-     *     public final String name;
-     *     public final int age;
-     *     public final Gender gender;
-     *     public final Optional&lt;String&gt; phoneNumber;
-     *
-     *     public Employee(String name, int age, Gender gender, Optional&lt;String&gt; phoneNumber) {
-     *         this.name = name;
-     *         this.age = age;
-     *         this.gender = gender;
-     *         this.phoneNumber = phoneNumber;
-     *     }
-     *
-     * }
-     *
-     * public class Example {
-     *
-     *     public static void main(String... args) {
-     *         Map&lt;String, Object&gt; employeeMap = new HashMap&lt;&gt;();
-     *         employeeMap.put("name", "Jaroslaw Pawlak");
-     *         employeeMap.put("age", 26);
-     *         employeeMap.put("gender", "MALE");
-     *         employeeMap.put("phoneNumber", null);
-     *
-     *         MapToObjectConverter converter = new MapToObjectConverter();
-     *
-     *         Employee employee = converter.convert(employeeMap, Employee.class);
-     *     }
-     * }
-     * </pre>
      *
      * @param map map to convert into object
      * @param targetClass a class whose instance will be created

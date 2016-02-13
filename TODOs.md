@@ -21,5 +21,8 @@
 2. bounded wildcards for Optional fields
 
 3. Single value to single field register-able converters
+  - java doc for two "register" methods
+  - readme
+  - javadoc of main class (example usage)
 
 4. Multi value to single field register-able converters
