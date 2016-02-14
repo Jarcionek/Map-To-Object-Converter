@@ -152,7 +152,7 @@ public class MapToObjectConverter {
     private void checkOptionalFieldsForNullValues(Map<String, Object> map, Class<?> targetClass) {
         Set<String> fieldsNames = fieldsOf(targetClass)
                 .filter(field -> field.getType() != Optional.class && map.get(field.getName()) == null)
-                .filter(field -> !converters.hasConverterFor(field.getGenericType()))
+                .filter(field -> !converters.hasRegisteredConverterFor(field.getGenericType()))
                 .map(Field::getName)
                 .collect(toCollection(LinkedHashSet::new));
 

@@ -30,7 +30,7 @@ class Converters {
         converters.put(type, new ExceptionWrappingSingleValueConverter<>(singleValueConverter));
     }
 
-    boolean hasConverterFor(Type type) {
+    boolean hasRegisteredConverterFor(Type type) {
         return converters.containsKey(type);
     }
 
@@ -66,7 +66,7 @@ class Converters {
             Object convertedValue = converter.convert(value);
 
             if (convertedValue != null && convertedValue.getClass() != parameterType) {
-                if (this.hasConverterFor(parameterType)) {
+                if (this.hasRegisteredConverterFor(parameterType)) {
                     throw new RegisteredConverterException("Cannot assign value of type 'Optional<%s>' returned by registered converter to field '%s' of type 'Optional<%s>'.", convertedValue.getClass().getTypeName(), fieldName, parameterType.getTypeName());
                 } else {
                     throw new ConverterTypeMismatchException("Cannot assign value of type 'Optional<%s>' to field '%s' of type 'Optional<%s>'.", value.getClass().getTypeName(), fieldName, parameterType.getTypeName());
