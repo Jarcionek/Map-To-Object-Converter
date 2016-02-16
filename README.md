@@ -1,5 +1,5 @@
 # Map-To-Object-Converter
-A tool that allows to easily convert `Map<String, Object>` returned by jdbi (but not only) into staticly typed classes.
+A tool that allows to easily convert `Map<String, Object>` returned by jdbi (but not only) into staticly typed objects.
 
 ### Example
 ```java
