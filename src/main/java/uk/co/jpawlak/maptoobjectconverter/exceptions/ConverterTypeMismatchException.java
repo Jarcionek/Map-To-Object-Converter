@@ -1,7 +1,8 @@
 package uk.co.jpawlak.maptoobjectconverter.exceptions;
 
 /**
- * Thrown when the type of the value is different than type of the field.
+ * Thrown when the value is not assignable to field. In case of {@link java.util.Optional optional} fields,
+ * it is thrown with type of the value is different than generic type parameter.
  */
 public class ConverterTypeMismatchException extends ConverterException {
 
