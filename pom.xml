@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
 
     <name>Map to Object Converter</name>
-    <description>Converts maps into staticly typed classes</description>
+    <description>Converts maps into staticly typed objects</description>
     <url>https://github.com/Jarcionek/Map-To-Object-Converter</url>
 
     <licenses>
