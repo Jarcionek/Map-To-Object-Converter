@@ -12,7 +12,6 @@ public enum Gender {
 }
 
 public class Employee {
-
     public final String name;
     public final int age;
     public final Gender gender;
@@ -24,7 +23,6 @@ public class Employee {
         this.gender = gender;
         this.phoneNumber = phoneNumber;
     }
-
 }
 
 public class Example {
