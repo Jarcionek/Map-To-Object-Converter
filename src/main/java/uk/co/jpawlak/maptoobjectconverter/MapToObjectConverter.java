@@ -88,15 +88,19 @@ public class MapToObjectConverter {
      * @throws uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterException or any of its subclasses
      */
     public <T> T convert(Map<String, Object> map, Class<T> targetClass) throws ConverterException {
-        checkParameters(map, targetClass);
-        checkKeysEqualToFieldsNames(map.keySet(), targetClass);
-        checkOptionalFieldsForNullValues(map, targetClass);
+        try {
+            checkParameters(map, targetClass);
+            checkKeysEqualToFieldsNames(map.keySet(), targetClass);
+            checkOptionalFieldsForNullValues(map, targetClass);
 
-        T result = createInstance(targetClass);
+            T result = createInstance(targetClass);
 
-        setFields(map, targetClass, result);
+            setFields(map, targetClass, result);
 
-        return result;
+            return result;
+        } catch (Exception e) {
+            throw e instanceof ConverterException ? (ConverterException) e : new ConverterUnknownException(e);
+        }
     }
 
     public <T> MapToObjectConverter registerConverter(Class<T> aClass, SingleValueConverter<T> singleValueConverter) {
