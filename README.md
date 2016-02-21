@@ -170,6 +170,6 @@ Just add a Maven dependency to your pom file:
 <dependency>
     <groupId>uk.co.jpawlak</groupId>
     <artifactId>map-to-object-converter</artifactId>
-    <version>1.1</version>
+    <version>2.0</version>
 </dependency>
 ```
