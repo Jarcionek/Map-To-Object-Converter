@@ -14,6 +14,7 @@
     - repositoryId is the id of the server with user credentials saved in `.m2/settings.xml`
     - to do this manually, go to `oss.sonatype.org / Staging Upload` and select the files
   - change version (and commit)
+  - update changelog
   - update version in quick start in readme
   - push changes to remote (together with tags):
     - `git push --tags`

@@ -1,7 +1,7 @@
-##### 2.0 (not yet released)
+##### 2.0 (21/02/2016)
 
 * added ability to register single value type converters
-* improved exception handling and changed the type of exceptions thrown
+* improved exception handling and changed the types of exceptions thrown
 
 ##### 1.1 (04/02/2016)
 
