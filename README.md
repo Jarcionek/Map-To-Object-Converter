@@ -157,6 +157,7 @@ public class Example {
 * can map String values to enums (using static `valueOf(String)` method)
 * allows to register type converters so you can convert String to enum using different method than `valueOf`, or you can convert int to enum
 * allows the fields to be supertypes of values, so you can assign `Integer` value to `Number` field
+* allows to ignore case of keys in the map
 * unfortunately, it doesn’t allow wildcards in `Optionals`, so `Integer` value can be assigned to `Optional<Integer>` field but cannot be assigned to field declared as `Optional<? extends Number>` (this might be improved in future)
 * doesn’t allow raw Optionals
 

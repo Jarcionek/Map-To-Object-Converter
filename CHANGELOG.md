@@ -1,3 +1,7 @@
+##### 2.1 (not yet released)
+
+* added key-case-insensitive mode
+
 ##### 2.0 (21/02/2016)
 
 * added ability to register single value type converters

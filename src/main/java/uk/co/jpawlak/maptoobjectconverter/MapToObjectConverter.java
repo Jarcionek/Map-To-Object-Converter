@@ -2,6 +2,7 @@ package uk.co.jpawlak.maptoobjectconverter;
 
 import sun.reflect.ReflectionFactory;
 import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterException;
+import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterFieldDuplicateException;
 import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterIllegalArgumentException;
 import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterMissingFieldsException;
 import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterMissingValuesException;
@@ -16,13 +17,17 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Utility class that allows to easily convert Map&lt;String, Object&gt; into staticly typed object.
@@ -40,6 +45,15 @@ public class MapToObjectConverter {
     private static final ReflectionFactory REFLECTION_FACTORY = ReflectionFactory.getReflectionFactory();
 
     private final Converters converters = new Converters();
+    private final boolean keyCaseSensitive;
+
+    public MapToObjectConverter() {
+        this(true);
+    }
+
+    public MapToObjectConverter(boolean keyCaseSensitive) {
+        this.keyCaseSensitive = keyCaseSensitive;
+    }
 
     /**
      * Converts Map&lt;String, Object&gt; into an instance of <code>targetClass</code>.
@@ -52,8 +66,11 @@ public class MapToObjectConverter {
      */
     public <T> T convert(Map<String, Object> map, Class<T> targetClass) throws ConverterException {
         try {
-            checkParameters(map, targetClass);
-            checkKeysEqualToFieldsNames(map.keySet(), targetClass);
+            checkParameters(map, targetClass, keyCaseSensitive);
+            if (!keyCaseSensitive) {
+                map = new CaseInsensitiveMap(map);
+            }
+            checkKeysEqualToFieldsNames(map.keySet(), targetClass, keyCaseSensitive);
             checkOptionalFieldsForNullValues(map, targetClass);
 
             T result = createInstance(targetClass);
@@ -71,12 +88,12 @@ public class MapToObjectConverter {
         return this;
     }
 
-    public <T> MapToObjectConverter registerConverter(Type type, SingleValueConverter<?> singleValueConverter) {
+    public MapToObjectConverter registerConverter(Type type, SingleValueConverter<?> singleValueConverter) {
         converters.registerConverter(type, singleValueConverter);
         return this;
     }
 
-    private static void checkParameters(Map<?, ?> map, Class<?> targetClass) {
+    private static void checkParameters(Map<?, ?> map, Class<?> targetClass, boolean keyCaseSensitive) {
         if (map == null) {
             throw new ConverterIllegalArgumentException("Map cannot be null.");
         }
@@ -98,12 +115,29 @@ public class MapToObjectConverter {
         if ((targetClass.getModifiers() & Modifier.ABSTRACT) != 0) {
             throw new ConverterIllegalArgumentException("Cannot convert map to abstract class.");
         }
+        if (!keyCaseSensitive) {
+            List<String> fieldsDuplicates = fieldsOf(targetClass)
+                    .map(Field::getName)
+                    .filter(fieldName1 -> fieldsOf(targetClass)
+                            .map(Field::getName)
+                            .filter(fieldName2 -> !fieldName1.equals(fieldName2) && fieldName1.equalsIgnoreCase(fieldName2))
+                            .findFirst()
+                            .isPresent()
+                    )
+                    .collect(toList());
+            if (!fieldsDuplicates.isEmpty()) {
+                throw new ConverterFieldDuplicateException("Fields '%s' are duplicates (converter is key case insensitive).", fieldsDuplicates.stream().collect(joining("', '")));
+            }
+        }
     }
 
-    private static void checkKeysEqualToFieldsNames(Set<String> keys, Class<?> targetClass) {
+    private static void checkKeysEqualToFieldsNames(Set<String> keys, Class<?> targetClass, boolean keyCaseSensitive) {
         Set<String> fieldsNames = fieldsOf(targetClass)
                 .map(Field::getName)
-                .collect(toCollection(LinkedHashSet::new));
+                .collect(collectingAndThen(
+                        toCollection(LinkedHashSet::new),
+                        keyCaseSensitive ? Function.identity() : CaseInsensitiveSet::new
+                ));
 
         Set<String> missingFields = keys.stream().filter(key -> !fieldsNames.contains(key)).collect(toCollection(LinkedHashSet::new));
         if (!missingFields.isEmpty()) {
