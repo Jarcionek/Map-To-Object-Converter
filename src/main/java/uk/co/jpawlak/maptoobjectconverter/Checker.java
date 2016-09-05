@@ -13,9 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 
-import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
@@ -72,11 +70,16 @@ class Checker {
     void checkKeysEqualToFieldsNames(Set<String> keys, Class<?> targetClass) {
         Set<String> fieldsNames = fieldsOf(targetClass)
                 .map(Field::getName)
-                .collect(collectingAndThen(
-                        toCollection(LinkedHashSet::new),
-                        keyCaseSensitive ? Function.identity() : CaseInsensitiveSet::new
-                ));
+                .collect(toCollection(LinkedHashSet::new));
 
+        if (!keyCaseSensitive) {
+            fieldsNames = new CaseInsensitiveSet(fieldsNames);
+        }
+
+        checkKeysEqualToFieldsNames(keys, fieldsNames);
+    }
+
+    private static void checkKeysEqualToFieldsNames(Set<String> keys, Set<String> fieldsNames) {
         Set<String> missingFields = keys.stream().filter(key -> !fieldsNames.contains(key)).collect(toCollection(LinkedHashSet::new));
         if (!missingFields.isEmpty()) {
             throw new ConverterMissingFieldsException("No fields for keys: '%s'.", missingFields.stream().collect(joining("', '")));
