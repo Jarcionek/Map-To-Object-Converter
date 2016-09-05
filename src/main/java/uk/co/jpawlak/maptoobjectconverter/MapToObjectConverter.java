@@ -47,7 +47,7 @@ public class MapToObjectConverter {
      * @param map map to convert into object
      * @param targetClass a class whose instance will be created
      * @param <T> the type of <code>targetClass</code>
-     * @return as instance of <code>targetClass</code>
+     * @return an instance of <code>targetClass</code>
      * @throws uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterException or any of its subclasses
      */
     public <T> T convert(Map<String, Object> map, Class<T> targetClass) throws ConverterException {
