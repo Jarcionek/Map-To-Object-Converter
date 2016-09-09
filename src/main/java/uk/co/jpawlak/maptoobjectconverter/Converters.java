@@ -1,6 +1,5 @@
 package uk.co.jpawlak.maptoobjectconverter;
 
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterEnumCreationException;
 import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterIllegalArgumentException;
 import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterTypeMismatchException;
@@ -8,6 +7,7 @@ import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterUnknownException;
 import uk.co.jpawlak.maptoobjectconverter.exceptions.RegisteredConverterException;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,12 +39,12 @@ class Converters {
             throw new ConverterIllegalArgumentException("Raw types are not supported. Field '%s' is 'Optional'.", fieldName);
         }
 
-        if (type instanceof ParameterizedTypeImpl && ((ParameterizedTypeImpl) type).getRawType() == Optional.class) {
-            Type parameterType = ((ParameterizedTypeImpl) type).getActualTypeArguments()[0];
+        if (type instanceof ParameterizedType && ((ParameterizedType) type).getRawType() == Optional.class) {
+            Type parameterType = ((ParameterizedType) type).getActualTypeArguments()[0];
             if (!(parameterType instanceof Class<?>)) {
                 throw new ConverterIllegalArgumentException("Wildcards are not supported. Field '%s' is 'Optional<%s>'.", fieldName, parameterType);
             }
-            return optionalValueConverter(type, fieldName);
+            return optionalValueConverter(parameterType, fieldName);
         }
 
         if (converters.containsKey(type)) {
@@ -58,10 +58,8 @@ class Converters {
         return value -> value;
     }
 
-    private SingleValueConverter<?> optionalValueConverter(Type type, String fieldName) {
+    private SingleValueConverter<?> optionalValueConverter(Type parameterType, String fieldName) {
         return value -> {
-            Type parameterType = ((ParameterizedTypeImpl) type).getActualTypeArguments()[0];
-
             SingleValueConverter<?> converter = this.getConverterFor(parameterType, fieldName);
             Object convertedValue = converter.convert(value);
 
