@@ -33,6 +33,13 @@ class Checker {
         if (map == null) {
             throw new ConverterIllegalArgumentException("Map cannot be null.");
         }
+        try {
+            if (map.containsKey(null)) {
+                throw new ConverterIllegalArgumentException("Map's keys cannot be null.");
+            }
+        } catch (NullPointerException ignored) {
+            // map does not permit null keys
+        }
         if (targetClass == null) {
             throw new ConverterIllegalArgumentException("Target class cannot be null.");
         }
@@ -56,7 +63,7 @@ class Checker {
                     .map(Field::getName)
                     .filter(fieldName1 -> fieldsOf(targetClass)
                             .map(Field::getName)
-                            .filter(fieldName2 -> !fieldName1.equals(fieldName2) && fieldName1.equalsIgnoreCase(fieldName2))
+                            .filter(fieldName2 -> fieldName1.equalsIgnoreCase(fieldName2) && !fieldName1.equals(fieldName2))
                             .findFirst()
                             .isPresent()
                     )

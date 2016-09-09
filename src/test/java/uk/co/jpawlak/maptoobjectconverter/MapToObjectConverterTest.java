@@ -9,6 +9,7 @@ import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterMissingFieldsExcep
 import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterMissingValuesException;
 import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterTypeMismatchException;
 
+import java.util.Hashtable;
 import java.util.Map;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
@@ -452,6 +453,22 @@ public class MapToObjectConverterTest {
         expectedException.expectMessage(equalTo("Map cannot be null."));
 
         mapToObjectConverter.convert(null, SimpleClass.class);
+    }
+
+    @Test
+    public void throwsExceptionWhenKeyIsNull() {
+        expectedException.expect(ConverterIllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("Map's keys cannot be null."));
+
+        mapToObjectConverter.convert(singletonMap(null, "string"), SimpleClass.class);
+    }
+
+    @Test
+    public void doesNotThrowsExceptionForValidMapWhichDoesNotPermitNullKeys() {
+        Map<String, Object> map = new Hashtable<>();
+        map.put("propertyName", "string");
+
+        mapToObjectConverter.convert(map, SimpleClass.class);
     }
 
     @Test
