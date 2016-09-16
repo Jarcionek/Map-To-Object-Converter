@@ -52,12 +52,23 @@ public class MapToObjectConverterTest_KeysCaseInsensitive {
 
     @Test
     public void throwsExceptionWhenMultipleFieldsHaveSameNameButDifferentCase() {
-        Map<String, Object> map = emptyMap();
+        Map<String, Object> map = ImmutableMap.<String, Object>builder()
+            .put("oNe", "1")
+            .put("Two", "2")
+            .put("thREE", "3")
+            .build();
 
-        expectedException.expect(ConverterIllegalArgumentException.class);
-        expectedException.expectMessage(equalTo("Fields 'one', 'oNe', 'onE', 'two', 'twO' are duplicates (converter is key case insensitive)."));
+        FieldDuplications actual = converter.convert(map, FieldDuplications.class);
 
-        converter.convert(map, FieldDuplications.class);
+        FieldDuplications expected = new FieldDuplications();
+        expected.one = "1";
+        expected.oNe = "1";
+        expected.onE = "1";
+        expected.two = "2";
+        expected.twO = "2";
+        expected.three = "3";
+
+        assertThat(actual, sameBeanAs(expected));
     }
 
     @Test

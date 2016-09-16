@@ -58,19 +58,6 @@ class Checker {
             throw new ConverterIllegalArgumentException("Cannot convert map to abstract class.");
         }
         if (!keyCaseSensitive) {
-            List<String> fieldsDuplicates = fieldsOf(targetClass)
-                    .map(Field::getName)
-                    .filter(fieldName1 -> fieldsOf(targetClass)
-                            .map(Field::getName)
-                            .filter(fieldName2 -> fieldName1.equalsIgnoreCase(fieldName2) && !fieldName1.equals(fieldName2))
-                            .findFirst()
-                            .isPresent()
-                    )
-                    .collect(toList());
-            if (!fieldsDuplicates.isEmpty()) {
-                throw new ConverterIllegalArgumentException("Fields '%s' are duplicates (converter is key case insensitive).", fieldsDuplicates.stream().collect(joining("', '")));
-            }
-
             List<String> keysDuplicates = map.keySet().stream()
                     .filter(key1 -> map.keySet().stream()
                             .filter(key2 -> key1.equalsIgnoreCase(key2) && !key1.equals(key2))
