@@ -4,7 +4,6 @@ package uk.co.jpawlak.maptoobjectconverter.exceptions;
  * Superclass for all converter exceptions.
  *
  * @see ConverterEnumCreationException
- * @see ConverterFieldDuplicateException
  * @see ConverterIllegalArgumentException
  * @see ConverterMissingFieldsException
  * @see ConverterMissingValuesException

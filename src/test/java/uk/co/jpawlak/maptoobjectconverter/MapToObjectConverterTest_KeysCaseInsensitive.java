@@ -1,9 +1,10 @@
 package uk.co.jpawlak.maptoobjectconverter;
 
+import com.google.common.collect.ImmutableMap;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterFieldDuplicateException;
+import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterIllegalArgumentException;
 
 import java.util.Map;
 
@@ -53,10 +54,27 @@ public class MapToObjectConverterTest_KeysCaseInsensitive {
     public void throwsExceptionWhenMultipleFieldsHaveSameNameButDifferentCase() {
         Map<String, Object> map = emptyMap();
 
-        expectedException.expect(ConverterFieldDuplicateException.class);
+        expectedException.expect(ConverterIllegalArgumentException.class);
         expectedException.expectMessage(equalTo("Fields 'one', 'oNe', 'onE', 'two', 'twO' are duplicates (converter is key case insensitive)."));
 
         converter.convert(map, FieldDuplications.class);
+    }
+
+    @Test
+    public void throwsExceptionWhenMapHasMultipleKeysWhichAreEqualIgnoringCase() {
+        Map<String, Object> map = ImmutableMap.<String, Object>builder()
+                .put("one", 0)
+                .put("oNe", 0)
+                .put("onE", 0)
+                .put("two", 0)
+                .put("twO", 0)
+                .put("three", 0)
+                .build();
+
+        expectedException.expect(ConverterIllegalArgumentException.class);
+        expectedException.expectMessage(equalTo("Keys 'one', 'oNe', 'onE', 'two', 'twO' are duplicates (converter is key case insensitive)."));
+
+        converter.convert(map, SimpleClass.class);
     }
 
 }

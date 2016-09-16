@@ -1,6 +1,5 @@
 package uk.co.jpawlak.maptoobjectconverter;
 
-import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterFieldDuplicateException;
 import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterIllegalArgumentException;
 import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterMissingFieldsException;
 import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterMissingValuesException;
@@ -29,7 +28,7 @@ class Checker {
         this.keyCaseSensitive = keyCaseSensitive;
     }
 
-    void checkParameters(Map<?, ?> map, Class<?> targetClass) {
+    void checkParameters(Map<String, ?> map, Class<?> targetClass) {
         if (map == null) {
             throw new ConverterIllegalArgumentException("Map cannot be null.");
         }
@@ -69,8 +68,20 @@ class Checker {
                     )
                     .collect(toList());
             if (!fieldsDuplicates.isEmpty()) {
-                throw new ConverterFieldDuplicateException("Fields '%s' are duplicates (converter is key case insensitive).", fieldsDuplicates.stream().collect(joining("', '")));
+                throw new ConverterIllegalArgumentException("Fields '%s' are duplicates (converter is key case insensitive).", fieldsDuplicates.stream().collect(joining("', '")));
             }
+
+            List<String> keysDuplicates = map.keySet().stream()
+                    .filter(key1 -> map.keySet().stream()
+                            .filter(key2 -> key1.equalsIgnoreCase(key2) && !key1.equals(key2))
+                            .findFirst()
+                            .isPresent()
+                    )
+                    .collect(toList());
+            if (!keysDuplicates.isEmpty()) {
+                throw new ConverterIllegalArgumentException("Keys '%s' are duplicates (converter is key case insensitive).", keysDuplicates.stream().collect(joining("', '")));
+            }
+
         }
     }
 
