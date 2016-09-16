@@ -5,6 +5,7 @@ import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterUnknownException;
 
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Utility class that allows to easily convert Map&lt;String, Object&gt; into staticly typed object.
@@ -48,7 +49,9 @@ public class MapToObjectConverter {
         try {
             checker.checkParameters(map, targetClass);
             if (!keyCaseSensitive) {
-                map = new CaseInsensitiveMap(map);
+                Map<String, Object> newMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+                newMap.putAll(map);
+                map = newMap;
             }
             checker.checkKeysEqualToFieldsNames(map.keySet(), targetClass);
             checker.checkOptionalFieldsForNullValues(map, targetClass);

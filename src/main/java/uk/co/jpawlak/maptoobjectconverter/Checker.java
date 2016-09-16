@@ -79,22 +79,29 @@ class Checker {
                 .map(Field::getName)
                 .collect(toCollection(LinkedHashSet::new));
 
-        if (!keyCaseSensitive) {
-            fieldsNames = new CaseInsensitiveSet(fieldsNames);
-        }
-
         checkKeysEqualToFieldsNames(keys, fieldsNames);
     }
 
-    private static void checkKeysEqualToFieldsNames(Set<String> keys, Set<String> fieldsNames) {
-        Set<String> missingFields = keys.stream().filter(key -> !fieldsNames.contains(key)).collect(toCollection(LinkedHashSet::new));
+    private void checkKeysEqualToFieldsNames(Set<String> keys, Set<String> fieldsNames) {
+        Set<String> missingFields = keys.stream().filter(key -> !contains(fieldsNames, key)).collect(toCollection(LinkedHashSet::new));
         if (!missingFields.isEmpty()) {
             throw new ConverterMissingFieldsException("No fields for keys: '%s'.", missingFields.stream().collect(joining("', '")));
         }
 
-        Set<String> missingValues = fieldsNames.stream().filter(fieldName -> !keys.contains(fieldName)).collect(toCollection(LinkedHashSet::new));
+        Set<String> missingValues = fieldsNames.stream().filter(fieldName -> !contains(keys, fieldName)).collect(toCollection(LinkedHashSet::new));
         if (!missingValues.isEmpty()) {
             throw new ConverterMissingValuesException("No values for fields: '%s'.", missingValues.stream().collect(joining("', '")));
+        }
+    }
+
+    private boolean contains(Set<String> set, String string) {
+        if (keyCaseSensitive) {
+            return set.contains(string);
+        } else {
+            return set.stream()
+                    .filter(value -> value.equalsIgnoreCase(string))
+                    .findFirst()
+                    .isPresent();
         }
     }
 
