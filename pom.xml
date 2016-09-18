@@ -7,7 +7,7 @@
 
     <groupId>uk.co.jpawlak</groupId>
     <artifactId>map-to-object-converter</artifactId>
-    <version>3.0</version>
+    <version>4.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Map to Object Converter</name>
