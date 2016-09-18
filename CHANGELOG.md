@@ -1,4 +1,4 @@
-##### 2.1 (not yet released)
+##### 3.0 (not yet released)
 
 * added key-case-insensitive mode
 
