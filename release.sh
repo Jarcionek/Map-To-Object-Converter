@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-#TODO: note that it has to be used in git bash, btw why it doesn't work in cygwin...? Maybe also some automated check...
-
 #TODO: add error handling - currently if anything fails at any point, the script still continues producing more errors
 
 # GET USER INPUT
