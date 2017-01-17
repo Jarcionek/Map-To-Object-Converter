@@ -8,16 +8,11 @@ read version
 echo 'ENTER GPG PASSPHRASE:'
 read -s passphrase
 
-# UPDATE VERSION IN POM FILE
-sed "s;^    <version>.*</version>;    <version>${version}</version>;" pom.xml > pom.xml2
-rm pom.xml
-mv pom.xml2 pom.xml
-git add pom.xml
-
-#TODO: update changelog with version and date (something smart checking the top line?)
-#TODO: update quick-start in readme with new version (should it be here before actual release?)
-
-# COMMIT, TAG AND PUSH
+# UPDATE VERSIONS
+sed -i "s|^    <version>.*</version>|    <version>${version}</version>|" pom.xml
+sed -i "1 s|^.*\$|##### ${version} (`date +%d/%m/%Y`)|g" CHANGELOG.md
+sed -i "s|^    <version>.*</version>|    <version>${version}</version>|" README.md
+git add pom.xml CHANGELOG.md README.md
 git commit -m "prepare release map-to-object-converter-${version}"
 git tag "${version}"
 
@@ -38,13 +33,17 @@ echo "${passphrase}" | gpg --passphrase-fd 0 -ab map-to-object-converter-${versi
 echo "${passphrase}" | gpg --passphrase-fd 0 -ab map-to-object-converter-${version}.jar
 echo "${passphrase}" | gpg --passphrase-fd 0 -ab map-to-object-converter-${version}-javadoc.jar
 echo "${passphrase}" | gpg --passphrase-fd 0 -ab map-to-object-converter-${version}-sources.jar
+cd ../..
 
-#TODO: update pom file with new snapshot version
-#TODO: add new header for changelog
-#TODO: git commit and push
+# PREPARE FOR NEXT ITERATION
+nextVersion=$((${version%%.*} + 1)).0
+sed -i "s|^    <version>.*</version>|    <version>${nextVersion}-SNAPSHOT</version>|" pom.xml
+sed -i "1s|^|##### ${nextVersion} (not yet released)\n\n|" CHANGELOG.md
+git add pom.xml CHANGELOG.md
+git commit -m "prepare for next development iteration"
 
 # FINAL NOTE
-echo "MANUAL STEP REQUIRED"
+echo -e "\nMANUAL STEP REQUIRED\n"
 echo "Go to 'oss.sonatype.org / Staging Upload' and upload the files from 'target/release'"
 echo "Then go to 'Staging Repositories', select repository and press 'Release' at the top"
 
