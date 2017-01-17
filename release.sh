@@ -6,8 +6,7 @@
 echo 'ENTER RELEASE VERSION:'
 read version
 echo 'ENTER GPG PASSPHRASE:'
-read passphrase
-#TODO: passphrase is visible on the console and then in the history, 'reset ; history -c' followed by what version is being released?
+read -s passphrase
 
 # UPDATE VERSION IN POM FILE
 sed "s;^    <version>.*</version>;    <version>${version}</version>;" pom.xml > pom.xml2
