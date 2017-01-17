@@ -1,3 +1,5 @@
+##### 4.0 (not yet released)
+
 ##### 3.0 (18/09/2016)
 
 * added key-case-insensitive mode
