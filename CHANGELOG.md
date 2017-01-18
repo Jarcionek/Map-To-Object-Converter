@@ -1,4 +1,6 @@
-##### 4.0 (not yet released)
+##### 3.1 (not yet released)
+
+* added missing documentation for registered converters and key-case-insensitive mode
 
 ##### 3.0 (18/09/2016)
 
