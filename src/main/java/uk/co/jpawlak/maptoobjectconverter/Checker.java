@@ -59,11 +59,7 @@ class Checker {
         }
         if (!keyCaseSensitive) {
             List<String> keysDuplicates = map.keySet().stream()
-                    .filter(key1 -> map.keySet().stream()
-                            .filter(key2 -> key1.equalsIgnoreCase(key2) && !key1.equals(key2))
-                            .findFirst()
-                            .isPresent()
-                    )
+                    .filter(key1 -> map.keySet().stream().anyMatch(key2 -> key1.equalsIgnoreCase(key2) && !key1.equals(key2)))
                     .collect(toList());
             if (!keysDuplicates.isEmpty()) {
                 throw new ConverterIllegalArgumentException("Keys '%s' are duplicates (converter is key case insensitive).", keysDuplicates.stream().collect(joining("', '")));
@@ -96,10 +92,7 @@ class Checker {
         if (keyCaseSensitive) {
             return set.contains(string);
         } else {
-            return set.stream()
-                    .filter(value -> value.equalsIgnoreCase(string))
-                    .findFirst()
-                    .isPresent();
+            return set.stream().anyMatch(value -> value.equalsIgnoreCase(string));
         }
     }
 
