@@ -1,6 +1,7 @@
 ##### 3.1 (not yet released)
 
 * added missing documentation for registered converters and key-case-insensitive mode
+* improved messages of RegisteredConverterException
 
 ##### 3.0 (18/09/2016)
 
