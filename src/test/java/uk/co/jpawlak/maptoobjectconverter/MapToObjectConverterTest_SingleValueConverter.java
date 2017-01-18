@@ -30,7 +30,8 @@ public class MapToObjectConverterTest_SingleValueConverter {
 
     private final MapToObjectConverter mapToObjectConverter = new MapToObjectConverter();
 
-
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Illegal argument
 
     @Test
     public void throwsExceptionWhenTryingToRegisterConverterForJavaOptional() {
@@ -57,6 +58,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Non-optional fields
 
     public static class SimpleClass {
         String string;
@@ -156,6 +158,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Optional fields
 
     public static class ClassWithOptionalField {
         Optional<Integer> optionalNumber;
@@ -231,6 +234,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Non-optional and optional enum fields
 
     private enum Enum {
         VALUE_OF, CONVERTER
@@ -261,6 +265,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Arrays fields
 
     private class ClassWithPrimitiveArray {
         int[] numbers;
@@ -370,6 +375,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Generic types fields
 
     private class ClassWithRawList {
         List list;
