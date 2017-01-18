@@ -65,6 +65,7 @@ class Converters {
 
             if (convertedValue != null && convertedValue.getClass() != parameterType) {
                 if (this.hasRegisteredConverterFor(parameterType)) {
+                    //TODO: this one is caught later - change the message?
                     throw new RegisteredConverterException("Cannot assign value of type 'Optional<%s>' returned by registered converter to field '%s' of type 'Optional<%s>'.", convertedValue.getClass().getTypeName(), fieldName, parameterType.getTypeName());
                 } else {
                     throw new ConverterTypeMismatchException("Cannot assign value of type 'Optional<%s>' to field '%s' of type 'Optional<%s>'.", value.getClass().getTypeName(), fieldName, parameterType.getTypeName());

@@ -43,11 +43,16 @@ class ObjectCreator {
         fieldsOf(targetClass).forEach(field -> {
             SingleValueConverter<?> converter = converters.getConverterFor(field.getGenericType(), field.getName());
             Object value = map.get(field.getName());
-            Object convertedValue = converter.convert(value);
-            if (convertedValue == null) {
-                throw new RegisteredConverterException("Null values require fields to be Optional. Registered converter for type '%s' returned null.", field.getType().getTypeName());
+            try {
+                Object convertedValue = converter.convert(value);
+                if (convertedValue == null) {
+                    throw new RegisteredConverterException("Null values require fields to be Optional. Registered converter for type '%s' returned null.", field.getType().getTypeName());
+                }
+                setField(result, field, convertedValue);
+            } catch (RegisteredConverterException e) {
+                e.setExtraMessage(targetClass, field);
+                throw e;
             }
-            setField(result, field, convertedValue);
         });
     }
 
