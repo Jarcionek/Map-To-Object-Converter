@@ -13,6 +13,7 @@ import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 
+@SuppressWarnings("unused")
 public class MapToObjectConverterTest_KeysCaseInsensitive {
 
     @Rule
@@ -50,7 +51,7 @@ public class MapToObjectConverterTest_KeysCaseInsensitive {
     }
 
     @Test
-    public void throwsExceptionWhenMultipleFieldsHaveSameNameButDifferentCase() {
+    public void setsAllFieldsOfTheSameName() {
         Map<String, Object> map = ImmutableMap.<String, Object>builder()
             .put("oNe", "1")
             .put("Two", "2")
@@ -85,6 +86,31 @@ public class MapToObjectConverterTest_KeysCaseInsensitive {
         expectedException.expectMessage(equalTo("Keys 'one', 'oNe', 'onE', 'two', 'twO' are duplicates (converter is key case insensitive)."));
 
         converter.convert(map, SimpleClass.class);
+    }
+
+
+
+    private static class FieldDuplicationsWithParentClass extends FieldDuplications {
+        String oNe;
+        private String getSuperONe() {
+            return super.oNe;
+        }
+    }
+
+    @Test
+    public void setsAllFieldsOfTheSameNameIfThereAreDuplicatedInSuperClasses() {
+        Map<String, Object> map = ImmutableMap.<String, Object>builder()
+                .put("oNe", "1")
+                .put("Two", "2")
+                .put("thREE", "3")
+                .build();
+
+        FieldDuplicationsWithParentClass actual = converter.convert(map, FieldDuplicationsWithParentClass.class);
+
+        assertThat(actual.one, equalTo("1"));
+        assertThat(actual.onE, equalTo("1"));
+        assertThat(actual.oNe, equalTo("1"));
+        assertThat(actual.getSuperONe(), equalTo("1"));
     }
 
 }
