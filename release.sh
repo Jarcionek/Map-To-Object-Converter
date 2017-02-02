@@ -10,7 +10,7 @@ read -s passphrase
 
 # UPDATE VERSIONS
 sed -i "s|^    <version>.*</version>|    <version>${version}</version>|" pom.xml
-sed -i "1 s|^.*\$|##### ${version} (`date +%d/%m/%Y`)|g" CHANGELOG.md
+sed -i "1s|^.*$|##### ${version} (`date +%d/%m/%Y`)|" CHANGELOG.md
 sed -i "s|^    <version>.*</version>|    <version>${version}</version>|" README.md
 git add pom.xml CHANGELOG.md README.md
 git commit -m "prepare release map-to-object-converter-${version}"
