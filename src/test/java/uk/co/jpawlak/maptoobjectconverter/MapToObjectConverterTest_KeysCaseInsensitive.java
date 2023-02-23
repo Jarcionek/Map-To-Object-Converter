@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterIllegalArgumentException;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static java.util.Collections.singletonMap;
@@ -72,14 +73,13 @@ public class MapToObjectConverterTest_KeysCaseInsensitive {
 
     @Test
     public void throwsExceptionWhenMapHasMultipleKeysWhichAreEqualIgnoringCase() {
-        Map<String, Object> map = Map.ofEntries(
-                Map.entry("one", 0),
-                Map.entry("oNe", 0),
-                Map.entry("onE", 0),
-                Map.entry("two", 0),
-                Map.entry("twO", 0),
-                Map.entry("three", 0)
-        );
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("one", 0);
+        map.put("oNe", 0);
+        map.put("onE", 0);
+        map.put("two", 0);
+        map.put("twO", 0);
+        map.put("three", 0);
 
         expectedException.expect(ConverterIllegalArgumentException.class);
         expectedException.expectMessage(equalTo("Keys 'one', 'oNe', 'onE', 'two', 'twO' are duplicates (converter is key case insensitive)."));
