@@ -1,6 +1,5 @@
 package uk.co.jpawlak.maptoobjectconverter;
 
-import com.google.common.collect.ImmutableMap;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -14,13 +13,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.shazam.shazamcrest.MatcherAssert.assertThat;
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static uk.co.jpawlak.maptoobjectconverter.TestUtil.assertObjectsEqual;
 
 @SuppressWarnings({"unused", "unchecked"})
 public class MapToObjectConverterTest_SingleValueConverter {
@@ -67,7 +65,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
 
     @Test
     public void usesRegisteredSingleValueConverter() {
-        Map<String, Object> map = ImmutableMap.of(
+        Map<String, Object> map = Map.of(
                 "string", "original value",
                 "number", 3
         );
@@ -80,12 +78,12 @@ public class MapToObjectConverterTest_SingleValueConverter {
         expected.string = "converted value";
         expected.number = 3;
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
     @Test
     public void usesMultipleRegisteredSingleValueConverters() {
-        Map<String, Object> map = ImmutableMap.of(
+        Map<String, Object> map = Map.of(
                 "string", "original value 2",
                 "number", "4"
         );
@@ -100,12 +98,12 @@ public class MapToObjectConverterTest_SingleValueConverter {
         expected.string = "converted value 2";
         expected.number = 4;
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
     @Test
     public void throwsExceptionWhenConverterReturnsNullAndFieldIsNotOptional() {
-        Map<String, Object> map = ImmutableMap.of(
+        Map<String, Object> map = Map.of(
                 "string", "whatever",
                 "number", 2
         );
@@ -122,7 +120,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
 
     @Test
     public void throwsExceptionWhenRegisteredConverterThrowsException() {
-        Map<String, Object> map = ImmutableMap.of(
+        Map<String, Object> map = Map.of(
                 "string", "whatever",
                 "number", 2
         );
@@ -154,7 +152,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
         expected.string = "non null";
         expected.number = 0;
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -175,7 +173,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
         ClassWithOptionalField expected = new ClassWithOptionalField();
         expected.optionalNumber = Optional.of(30);
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
     @Test
@@ -189,7 +187,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
         ClassWithOptionalField expected = new ClassWithOptionalField();
         expected.optionalNumber = Optional.empty();
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
     @Test
@@ -230,7 +228,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
         ClassWithOptionalField expected = new ClassWithOptionalField();
         expected.optionalNumber = Optional.of(852);
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -247,7 +245,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
 
     @Test
     public void usesRegisteredEnumConverterInsteadOfValueOf() {
-        Map<String, Object> map = ImmutableMap.of(
+        Map<String, Object> map = Map.of(
                 "enumField", "VALUE_OF",
                 "optionalEnumField", "VALUE_OF"
         );
@@ -261,7 +259,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
         expected.enumField = Enum.CONVERTER;
         expected.optionalEnumField = Optional.of(Enum.CONVERTER);
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -289,7 +287,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
         ClassWithPrimitiveArray expected = new ClassWithPrimitiveArray();
         expected.numbers = new int[] {1, 2, 3};
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
     @Test
@@ -303,7 +301,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
         ClassWithOptionalPrimitiveArray expected = new ClassWithOptionalPrimitiveArray();
         expected.numbers = Optional.of(new int[] {2, 4, 8, 16});
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
     @Test
@@ -317,7 +315,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
         ClassWithIntegerArray expected = new ClassWithIntegerArray();
         expected.numbers =  new Integer[] {7, 15};
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
     @Test
@@ -393,7 +391,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
         ClassWithRawList expected = new ClassWithRawList();
         expected.list = asList(3, 6, 9);
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
 
@@ -424,7 +422,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
 
     @Test
     public void allowsToRegisterConvertersForGenericTypes() throws NoSuchFieldException {
-        Map<String, Object> map = ImmutableMap.of(
+        Map<String, Object> map = Map.of(
                 "numbers", "whatever 1",
                 "words", "whatever 2"
         );
@@ -442,7 +440,7 @@ public class MapToObjectConverterTest_SingleValueConverter {
         expected.numbers = asList(-5, 0, 5);
         expected.words = asList("a", "b", "c");
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
 }

@@ -1,6 +1,5 @@
 package uk.co.jpawlak.maptoobjectconverter;
 
-import com.google.common.collect.ImmutableMap;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -8,10 +7,10 @@ import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterIllegalArgumentExc
 
 import java.util.Map;
 
-import static com.shazam.shazamcrest.MatcherAssert.assertThat;
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static uk.co.jpawlak.maptoobjectconverter.TestUtil.assertObjectsEqual;
 
 @SuppressWarnings("unused")
 public class MapToObjectConverterTest_KeysCaseInsensitive {
@@ -36,7 +35,7 @@ public class MapToObjectConverterTest_KeysCaseInsensitive {
         SimpleClass expected = new SimpleClass();
         expected.propertyName = "stringValue";
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
 
@@ -52,11 +51,11 @@ public class MapToObjectConverterTest_KeysCaseInsensitive {
 
     @Test
     public void setsAllFieldsOfTheSameName() {
-        Map<String, Object> map = ImmutableMap.<String, Object>builder()
-            .put("oNe", "1")
-            .put("Two", "2")
-            .put("thREE", "3")
-            .build();
+        Map<String, Object> map = Map.of(
+            "oNe", "1",
+            "Two", "2",
+            "thREE", "3"
+        );
 
         FieldDuplications actual = converter.convert(map, FieldDuplications.class);
 
@@ -68,19 +67,19 @@ public class MapToObjectConverterTest_KeysCaseInsensitive {
         expected.twO = "2";
         expected.three = "3";
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
     @Test
     public void throwsExceptionWhenMapHasMultipleKeysWhichAreEqualIgnoringCase() {
-        Map<String, Object> map = ImmutableMap.<String, Object>builder()
-                .put("one", 0)
-                .put("oNe", 0)
-                .put("onE", 0)
-                .put("two", 0)
-                .put("twO", 0)
-                .put("three", 0)
-                .build();
+        Map<String, Object> map = Map.ofEntries(
+                Map.entry("one", 0),
+                Map.entry("oNe", 0),
+                Map.entry("onE", 0),
+                Map.entry("two", 0),
+                Map.entry("twO", 0),
+                Map.entry("three", 0)
+        );
 
         expectedException.expect(ConverterIllegalArgumentException.class);
         expectedException.expectMessage(equalTo("Keys 'one', 'oNe', 'onE', 'two', 'twO' are duplicates (converter is key case insensitive)."));
@@ -99,11 +98,11 @@ public class MapToObjectConverterTest_KeysCaseInsensitive {
 
     @Test
     public void setsAllFieldsOfTheSameNameIfThereAreDuplicatedInSuperClasses() {
-        Map<String, Object> map = ImmutableMap.<String, Object>builder()
-                .put("oNe", "1")
-                .put("Two", "2")
-                .put("thREE", "3")
-                .build();
+        Map<String, Object> map = Map.of(
+                "oNe", "1",
+                "Two", "2",
+                "thREE", "3"
+        );
 
         FieldDuplicationsWithParentClass actual = converter.convert(map, FieldDuplicationsWithParentClass.class);
 

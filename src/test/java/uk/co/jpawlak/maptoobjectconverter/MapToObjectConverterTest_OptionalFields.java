@@ -11,10 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.shazam.shazamcrest.MatcherAssert.assertThat;
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static uk.co.jpawlak.maptoobjectconverter.TestUtil.assertObjectsEqual;
 
 @SuppressWarnings({"unused", "OptionalUsedAsFieldOrParameterType"})
 public class MapToObjectConverterTest_OptionalFields {
@@ -70,7 +69,7 @@ public class MapToObjectConverterTest_OptionalFields {
         ClassWithOptionalField expected = new ClassWithOptionalField();
         expected.optionalAddress = Optional.empty();
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
     @Test
@@ -82,7 +81,7 @@ public class MapToObjectConverterTest_OptionalFields {
         ClassWithOptionalField expected = new ClassWithOptionalField();
         expected.optionalAddress = Optional.of("123");
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
     @Test

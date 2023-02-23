@@ -9,10 +9,9 @@ import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterNullValueException
 import java.util.Map;
 import java.util.Optional;
 
-import static com.shazam.shazamcrest.MatcherAssert.assertThat;
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static uk.co.jpawlak.maptoobjectconverter.TestUtil.assertObjectsEqual;
 
 @SuppressWarnings({"unused", "OptionalUsedAsFieldOrParameterType"})
 public class MapToObjectConverterTest_EnumFields {
@@ -41,7 +40,7 @@ public class MapToObjectConverterTest_EnumFields {
         ClassWithEnumField expected = new ClassWithEnumField();
         expected.x = MyEnum.ONE;
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
     @Test
@@ -89,7 +88,7 @@ public class MapToObjectConverterTest_EnumFields {
         ClassWithOptionalEnumField expected = new ClassWithOptionalEnumField();
         expected.x = Optional.of(MyEnum.TWO);
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
     @Test
@@ -101,7 +100,7 @@ public class MapToObjectConverterTest_EnumFields {
         ClassWithOptionalEnumField expected = new ClassWithOptionalEnumField();
         expected.x = Optional.empty();
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
     @Test

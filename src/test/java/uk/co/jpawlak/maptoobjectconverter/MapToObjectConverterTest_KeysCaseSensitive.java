@@ -1,6 +1,5 @@
 package uk.co.jpawlak.maptoobjectconverter;
 
-import com.google.common.collect.ImmutableMap;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -9,10 +8,9 @@ import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterMissingValuesExcep
 
 import java.util.Map;
 
-import static com.shazam.shazamcrest.MatcherAssert.assertThat;
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static uk.co.jpawlak.maptoobjectconverter.TestUtil.assertObjectsEqual;
 
 public class MapToObjectConverterTest_KeysCaseSensitive {
 
@@ -30,7 +28,7 @@ public class MapToObjectConverterTest_KeysCaseSensitive {
 
     @Test
     public void assignsToFieldsConsideringCase() {
-        Map<String, Object> map = ImmutableMap.of(
+        Map<String, Object> map = Map.of(
                 "tExT", "1",
                 "teXt", "2"
         );
@@ -41,7 +39,7 @@ public class MapToObjectConverterTest_KeysCaseSensitive {
         expected.tExT = "1";
         expected.teXt = "2";
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
 
@@ -57,7 +55,7 @@ public class MapToObjectConverterTest_KeysCaseSensitive {
 
     @Test
     public void throwsExceptionWhenMoreKeysThanFields() {
-        Map<String, Object> map = ImmutableMap.of(
+        Map<String, Object> map = Map.of(
                 "tExT", "1",
                 "teXt", "2",
                 "text", "3"

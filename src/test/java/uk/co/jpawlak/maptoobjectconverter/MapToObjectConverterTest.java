@@ -1,6 +1,6 @@
 package uk.co.jpawlak.maptoobjectconverter;
 
-import com.google.common.collect.ImmutableMap;
+import org.hamcrest.MatcherAssert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -12,10 +12,10 @@ import uk.co.jpawlak.maptoobjectconverter.exceptions.ConverterTypeMismatchExcept
 import java.util.Hashtable;
 import java.util.Map;
 
-import static com.shazam.shazamcrest.MatcherAssert.assertThat;
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static uk.co.jpawlak.maptoobjectconverter.TestUtil.assertObjectsEqual;
 
 @SuppressWarnings({"SameParameterValue", "unused", "WeakerAccess"})
 public class MapToObjectConverterTest {
@@ -40,7 +40,7 @@ public class MapToObjectConverterTest {
         SimpleClass expected = new SimpleClass();
         expected.propertyName = "stringValue";
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
     @Test
@@ -153,7 +153,7 @@ public class MapToObjectConverterTest {
 
     @Test
     public void convertsMapToObjectOfSpecifiedClassWithMultipleFields() {
-        Map<String, Object> map = ImmutableMap.of(
+        Map<String, Object> map = Map.of(
                 "one", "1",
                 "two", "2",
                 "three", "3"
@@ -166,12 +166,12 @@ public class MapToObjectConverterTest {
         expected.two = "2";
         expected.three = "3";
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
     @Test
     public void throwsExceptionWhenMoreKeysThanFields() {
-        Map<String, Object> map = ImmutableMap.of(
+        Map<String, Object> map = Map.of(
                 "one", "1",
                 "two", "2",
                 "three", "3",
@@ -226,16 +226,16 @@ public class MapToObjectConverterTest {
 
     @Test
     public void setsBoxedPrimitiveFields() {
-        Map<String, Object> map = ImmutableMap.<String, Object>builder()
-                .put("_character", 'a')
-                .put("_boolean", true)
-                .put("_byte", (byte) 1)
-                .put("_short", (short) 2)
-                .put("_integer", 3)
-                .put("_long", 4L)
-                .put("_float", 0.5f)
-                .put("_double", 0.25d)
-                .build();
+        Map<String, Object> map = Map.ofEntries(
+                Map.entry("_character", 'a'),
+                Map.entry("_boolean", true),
+                Map.entry("_byte", (byte) 1),
+                Map.entry("_short", (short) 2),
+                Map.entry("_integer", 3),
+                Map.entry("_long", 4L),
+                Map.entry("_float", 0.5f),
+                Map.entry("_double", 0.25d)
+        );
 
         ClassWithBoxedPrimitiveDataTypes actual = mapToObjectConverter.convert(map, ClassWithBoxedPrimitiveDataTypes.class);
 
@@ -249,7 +249,7 @@ public class MapToObjectConverterTest {
         expected._float = 0.5f;
         expected._double = 0.25d;
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
 
@@ -267,16 +267,16 @@ public class MapToObjectConverterTest {
 
     @Test
     public void setsUnboxedPrimitiveFields() {
-        Map<String, Object> map = ImmutableMap.<String, Object>builder()
-                .put("_character", 'a')
-                .put("_boolean", true)
-                .put("_byte", (byte) 1)
-                .put("_short", (short) 2)
-                .put("_integer", 3)
-                .put("_long", 4L)
-                .put("_float", 0.5f)
-                .put("_double", 0.25d)
-                .build();
+        Map<String, Object> map = Map.ofEntries(
+                Map.entry("_character", 'a'),
+                Map.entry("_boolean", true),
+                Map.entry("_byte", (byte) 1),
+                Map.entry("_short", (short) 2),
+                Map.entry("_integer", 3),
+                Map.entry("_long", 4L),
+                Map.entry("_float", 0.5f),
+                Map.entry("_double", 0.25d)
+        );
 
         ClassWithUnboxedPrimitiveDataTypes actual = mapToObjectConverter.convert(map, ClassWithUnboxedPrimitiveDataTypes.class);
 
@@ -290,7 +290,7 @@ public class MapToObjectConverterTest {
         expected._float = 0.5f;
         expected._double = 0.25d;
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
 
@@ -308,7 +308,7 @@ public class MapToObjectConverterTest {
         ClassWithPrivateField expected = new ClassWithPrivateField();
         expected.string = "value";
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
 
@@ -328,7 +328,7 @@ public class MapToObjectConverterTest {
 
         ClassWithFinalField expected = new ClassWithFinalField("value");
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
 
@@ -343,7 +343,7 @@ public class MapToObjectConverterTest {
 
     @Test
     public void considersFieldsInSuperClasses() {
-        Map<String, Object> map = ImmutableMap.of(
+        Map<String, Object> map = Map.of(
                 "a", 1,
                 "b", 2
         );
@@ -354,7 +354,7 @@ public class MapToObjectConverterTest {
         expected.a = 1;
         expected.b = 2;
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
 
@@ -368,7 +368,7 @@ public class MapToObjectConverterTest {
 
     @Test
     public void setsAllFieldsOfTheSameNameIfThereAreDuplicatedInSuperClasses() {
-        Map<String, Object> map = ImmutableMap.of(
+        Map<String, Object> map = Map.of(
                 "a", 7
         );
 
@@ -386,7 +386,7 @@ public class MapToObjectConverterTest {
 
     @Test
     public void throwsTypeMismatchExceptionWhenChildAndParentClassesHaveFieldOfTheSameNameButOfDifferentType() {
-        Map<String, Object> map = ImmutableMap.of(
+        Map<String, Object> map = Map.of(
                 "a", 7
         );
 
@@ -412,7 +412,7 @@ public class MapToObjectConverterTest {
         ClassWithStaticField expected = new ClassWithStaticField();
         expected.y = 4;
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
 
@@ -545,7 +545,7 @@ public class MapToObjectConverterTest {
         ClassWithAbstractField expected = new ClassWithAbstractField();
         expected.x = 5;
 
-        assertThat(actual, sameBeanAs(expected));
+        assertObjectsEqual(actual, expected);
     }
 
 }
